@@ -120,6 +120,22 @@ class DFA:
 # 0 - / -> 5
 # 5 - ^/* -> 6a
 
+# WHITESPACE states and transitions:
+#number of nodes = 3
+# 0 - Whitespace -> 1
+# 1 - Whitespace -> 1
+# 1 - ^Whitespace -> 2*a
+
+#COMMENT states and transitions:
+#number of nodes = 3
+# 0 - / -> 1
+# 1 - * -> 2
+# 2 - * -> 3
+# 2 - ^* -> 2
+# 3 - ^*/ -> 2
+# 3 - * -> 3
+# 3 - / -> 4*a
+
 
 def add_token_states(dfa):
 
@@ -144,6 +160,19 @@ def add_token_states(dfa):
             5: {'^/*': (6, True, False)}
         }
 
+        whitespace_dfa = {
+            0: {'Whitespace': 1},
+            1: {'Whitespace': 1, '^Whitespace': (2, False, True)}
+        }
+
+        comment_dfa = {
+            0: {'/': 1},
+            1: {'*': 2},
+            2: {'*': 3, '^*': 2},
+            3: {'^*/': 2, '*': 3, '/': (4, False, True) }
+
+        }
+
         # Calculate the starting offset for each mini DFA
         offset = len(dfa.states)
 
@@ -158,7 +187,13 @@ def add_token_states(dfa):
         offset += len(keyword_dfa)
 
         dfa.add_mini_dfa(symbol_dfa, offset)
+        offset += len(symbol_dfa)
 
+        dfa.add_mini_dfa(whitespace_dfa, offset)
+        offset += len(whitespace_dfa)
+
+        dfa.add_mini_dfa(comment_dfa, offset)
+        offset += len(comment_dfa)
 
 
 dfa = DFA()
