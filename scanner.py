@@ -10,8 +10,9 @@ all_alphabets = lower_case_alphabet + upper_case_alphabet
 excluded_symbols = [char for char in symbol if char not in ['/', '*']]
 excluded_symbols_1= [char for char in symbol if char not in ['=']]
 excluded_symbols_2= [char for char in symbol if char not in ['*']]
+excluded_symbols_3= [char for char in symbol if char not in ['/']]
 
-type_dict = { 'Digit' : digits , '^Digit': all_alphabets + symbol + white_space + ['\x00'] ,  'SEE' :see , 'Alpha' : all_alphabets , 
+type_dict = { 'Digit' : digits , '^Digit': excluded_symbols_3 + white_space + ['\x00'] ,  'SEE' :see , 'Alpha' : all_alphabets , 
          'alpha' : lower_case_alphabet , '^alpha' : upper_case_alphabet + digits + symbol + white_space + ['\x00'] ,
          'AlphaDigit' : all_alphabets + digits , '^AlphaDigit' : symbol + white_space + ['\x00'] , '^Alpha' :  digits + symbol + white_space + ['\x00'],
            '^/*':  all_alphabets + digits + excluded_symbols + white_space + ['\x00'] , 
@@ -72,8 +73,8 @@ class DFA:
         if not current_transiton :
            return False 
         
-        # print("char",char, "current_state ", self.current_state  ,"transition ", current_transiton  )
-        # print("next state", self.transitions[self.current_state][current_transiton])
+        print("char",char, "current_state ", self.current_state  ,"transition ", current_transiton  )
+        print("next state", self.transitions[self.current_state][current_transiton])
 
         self.current_state = self.transitions[self.current_state][current_transiton]
 
@@ -257,7 +258,7 @@ def Scanner ( input_string , dfa ) :
                     print("Unclosed comment", input_string[point1:point2+1])
                     break
 
-            if(dfa.states_type[dfa.current_state] in ['ID','KEYWORD']):
+            if(dfa.current_state == 0 or dfa.states_type[dfa.current_state] in ['ID','KEYWORD']):
                 if(current_ch == '*' and input_string[point2+1] == "/"):
                     print("Unmatched comment" , "*/")
                     dfa.current_state = 0
@@ -284,18 +285,21 @@ def Scanner ( input_string , dfa ) :
                 point2+=1 
                 point1=point2
         else :
+
+            if(dfa.current_state == 0 or dfa.states_type[dfa.current_state] in ['ID','KEYWORD']):
+                print("Invalid input",input_string[point1:point2+1])
+                dfa.current_state = 0
+                point2+=1
+                point1=point2
+                continue
+
+                                
             if(dfa.states_type[dfa.current_state] == 'NUM') :
                 print("invalid number" , input_string[point1:point2+1])
                 dfa.current_state = 0
                 point2+=1
                 point1=point2
-
-            if(dfa.states_type[dfa.current_state] in ['ID','KEYWORD']):
-                print("Invalid input",input_string[point1:point2+1])
-                dfa.current_state = 0
-                point2+=1
-                point1=point2
-                                
+                continue
                    
 
 
