@@ -8,14 +8,12 @@ from collections import defaultdict
 
 
 class ParseTreeNode:
-    def __init__(self, symbol, data=None):
+    def __init__(self, symbol):
         self.symbol = symbol
-        self.data = data
         self.children = []
 
-    def add_child(self, child):
-        self.children.append(child)
-
+    def add_child(self, child_node):
+        self.children.append(child_node)
 
 
 white_space = [' ' , '  ','\r','\n','\t','\f','\v']
@@ -655,25 +653,28 @@ df.to_csv(output_path, index=True)
 
 
 token_lists = defaultdict(list)
-
+last_number = 0
 for line_number in sorted(tokens_table):
     line_tokens = []
     for token in tokens_table[line_number]:
         token_type, token_value = token[1:len(token)-1].split(', ')
         token_value = token_value.strip()
         line_tokens.append((token_type , token_value))
+    last_number = line_number
     token_lists[line_number] = line_tokens
 
+token_lists[last_number].append(('$','$'))
 
 print(token_lists)
 
 
-def print_parse_tree(node, depth=0, last=True):
-    prefix = "└── " if last else "├── "
-    print('    ' * depth + (prefix if depth else '') + node.symbol if depth else node.symbol)
-    for i, child in enumerate(node.children):
-        print_parse_tree(child, depth + 1, i == len(node.children) - 1)
-
+# def print_parse_tree(node, depth=0, last=True):
+#     prefix = "└── " if last else "├── "
+#     if node.symbol != 'epsilon' or (node.symbol == 'epsilon' and depth > 0):
+#         # Only print the epsilon if it's not the root node
+#         print('    ' * depth + (prefix if depth else '') + node.symbol if depth else node.symbol)
+#     for i, child in enumerate(node.children):
+#         print_parse_tree(child, depth + 1, i == len(node.children) - 1)
 
 
 
@@ -696,20 +697,33 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
             # Match found, move to the next token
             new_node = ParseTreeNode(token)
             current_node.add_child(new_node)
-            print("token  :", token, "top:", top)
             current_node = new_node  
             index += 1
         elif top in parsing_table and token in parsing_table[top]:
             production = parsing_table[top][token]
-            if production != 'epsilon':
-                stack.extend(production[::-1])  # Push the production in reverse order to the stack
             # Create a new node in the parse tree
             new_node = ParseTreeNode(top)
             current_node.add_child(new_node)
 
-            print("token  :", token, "top:", top,"production", production)
+            if production != 'epsilon':
+                stack.extend(production[::-1])  # Push the production in reverse order to the stack
+                # Add children nodes for each symbol in the production
+                for symbol in production:
+                    child_node = ParseTreeNode(symbol)
+                    new_node.add_child(child_node)
+                    if symbol in first_sets and 'epsilon' in first_sets[symbol]:
+                        # If symbol can produce epsilon, add epsilon as a child node
+                        epsilon_node = ParseTreeNode('epsilon')
+                        child_node.add_child(epsilon_node)
+            else:
+                # If production is epsilon, add epsilon as a child node
+                epsilon_node = ParseTreeNode('epsilon')
+                new_node.add_child(epsilon_node)
 
-            current_node = new_node  # Move to the new node
+            # Move to the new node unless the production is epsilon
+            if production != 'epsilon':
+                current_node = new_node
+
         elif top in follow_sets and token in follow_sets[top]:
             # Error recovery: pop the stack if top is in follow set of token
             errors.append(f"#{line_num} : syntax error, missing {top}")
@@ -734,8 +748,23 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
 # Now call the parse function with the token list
 parse_tree, parse_errors = parse(token_lists, parsing_table, first_sets, follow_sets)
 
+
+
+def write_parse_tree(node, file, depth=0, last=True):
+    prefix = "└── " if last else "├── "
+    if node.symbol != 'epsilon' or (node.symbol == 'epsilon' and depth > 0):
+        # Only write the epsilon if it's not the root node
+        file.write('    ' * depth + (prefix if depth else '') + node.symbol + '\n')
+    for i, child in enumerate(node.children):
+        write_parse_tree(child, file, depth + 1, i == len(node.children) - 1)
+
+# Use the function to write the parse tree to 'parse_tree.txt'
+with open('parse_tree.txt', 'w') as file:
+    write_parse_tree(parse_tree, file)
+
+
+
 # Print the parse tree and the errors
-print_parse_tree(parse_tree)
 for error in parse_errors:
     print(error)
 
