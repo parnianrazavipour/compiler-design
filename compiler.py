@@ -465,8 +465,12 @@ first_sets = data['firstSets']
 follow_sets = data['followSets']
 
 
+for key , val in first_sets.items():
+    for i in range(len(val)) :
+        if val[i] is None :
+            val[i] = 'epsilon'
 
-
+# print(first_sets)
 
 
 left = 'left'
@@ -566,12 +570,12 @@ keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{'
 firstSetOfNonTerminals = {key: [key] for key in keys}
 
 def add_to_parsing_table(non_terminal, terminal, production):
-    # if terminal is None :
-    #     terminal = 'epsilon'
+    if terminal is None :
+        print("terminal :", terminal)
     if terminal == '\u0000' :
         terminal = '$'
-    # if production is None :
-    #     production = 'epsilon'
+    if production is None :
+        production = 'epsilon'
     if non_terminal not in parsing_table:
         parsing_table[non_terminal] = {}
     parsing_table[non_terminal][terminal] = production
@@ -591,7 +595,7 @@ for rule in grammar_rules:
                 else:   
                     add_to_parsing_table(A, symbol, alpha)
 
-            if None in first_sets[alpha[0]]: 
+            if 'epsilon' in first_sets[alpha[0]]: 
                 for symbol in follow_sets[A]:
                     add_to_parsing_table(A, symbol, alpha)
 
@@ -600,7 +604,7 @@ for rule in grammar_rules:
 
     else:
 
-        if alpha[0] is 'epsilon':
+        if alpha[0] == 'epsilon':
             add_to_parsing_table(A, 'epsilon', alpha)
             
             for symbol in follow_sets[A]:
@@ -632,11 +636,12 @@ def add_synch_to_parsing_table(parsing_table, follow_sets):
 
 add_synch_to_parsing_table(parsing_table, follow_sets)
 
+# print(parsing_table)
 
-df = pd.DataFrame.from_dict(parsing_table, orient='index').fillna('')
-print(df.columns)
-output_path = 'parsing_table.csv'
-df.to_csv(output_path, index=True)
+print(parsing_table['Program'])
+# df = pd.DataFrame.from_dict(parsing_table, orient='index').fillna('')
+# output_path = 'parsing_table.csv'
+# df.to_csv(output_path, index=True)
 
 
 token_lists = defaultdict(list)
