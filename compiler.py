@@ -435,6 +435,7 @@ def write_tokens():
             tokens = ' '.join(tokens_table[line_number])
             file.write(f"{line_number}.\t{tokens}\n")
 
+
 def write_lexical_errors():
     with open('lexical_errors.txt', 'w') as file:
         for line_number, errors in lexical_errors_table.items():
@@ -466,6 +467,8 @@ follow_sets = data['followSets']
 
 
 
+
+
 left = 'left'
 right = 'right'
 null = None
@@ -473,7 +476,7 @@ null = None
 grammar_rules =  [
   { left: 'Program', right: ['DeclarationList'] },
   { left: 'DeclarationList', right: ['Declaration', 'DeclarationList'] },
-  { left: 'DeclarationList', right: [null] },
+  { left: 'DeclarationList', right: ['epsilon'] },
   { left: 'Declaration', right: ['DeclarationInitial', 'DeclarationPrime'] },
   { left: 'DeclarationInitial', right: ['TypeSpecifier', 'ID'] },
   { left: 'DeclarationPrime', right: ['FunDeclarationPrime'] },
@@ -486,13 +489,13 @@ grammar_rules =  [
   { left: 'Params', right: ['int', 'ID', 'ParamPrime', 'ParamList'] },
   { left: 'Params', right: ['void'] },
   { left: 'ParamList', right: [',', 'Param', 'ParamList'] },
-  { left: 'ParamList', right: [null] },
+  { left: 'ParamList', right: ['epsilon'] },
   { left: 'Param', right: ['DeclarationInitial', 'ParamPrime'] },
   { left: 'ParamPrime', right: ['[', ']'] },
-  { left: 'ParamPrime', right: [null] },
+  { left: 'ParamPrime', right: ['epsilon'] },
   { left: 'CompoundStmt', right: ['{', 'DeclarationList', 'StatementList', '}'] },
   { left: 'StatementList', right: ['Statement', 'StatementList'] },
-  { left: 'StatementList', right: [null] },
+  { left: 'StatementList', right: ['epsilon'] },
   { left: 'Statement', right: ['ExpressionStmt'] },
   { left: 'Statement', right: ['CompoundStmt'] },
   { left: 'Statement', right: ['SelectionStmt'] },
@@ -516,37 +519,37 @@ grammar_rules =  [
   { left: 'SimpleExpressionZegond', right: ['AdditiveExpressionZegond', 'C'] },
   { left: 'SimpleExpressionPrime', right: ['AdditiveExpressionPrime', 'C'] },
   { left: 'C', right: ['Relop', 'AdditiveExpression'] },
-  { left: 'C', right: [null] },
+  { left: 'C', right: ['epsilon'] },
   { left: 'Relop', right: ['<'] },
   { left: 'Relop', right: ['=='] },
   { left: 'AdditiveExpression', right: ['Term', 'D'] },
   { left: 'AdditiveExpressionPrime', right: ['TermPrime', 'D'] },
   { left: 'AdditiveExpressionZegond', right: ['TermZegond', 'D'] },
   { left: 'D', right: ['Addop', 'Term', 'D'] },
-  { left: 'D', right: [null] },
+  { left: 'D', right: ['epsilon'] },
   { left: 'Addop', right: ['+'] },
   { left: 'Addop', right: ['-'] },
   { left: 'Term', right: ['SignedFactor', 'G'] },
   { left: 'TermPrime', right: ['SignedFactorPrime', 'G'] },
   { left: 'TermZegond', right: ['SignedFactorZegond', 'G'] },
   { left: 'G', right: ['*', 'Factor', 'G'] },
-  { left: 'G', right: [null] },
+  { left: 'G', right: ['epsilon'] },
   { left: 'Factor', right: ['(', 'Expression', ')'] },
   { left: 'Factor', right: ['ID', 'VarCallPrime'] },
   { left: 'Factor', right: ['NUM'] },
   { left: 'VarCallPrime', right: ['(', 'Args', ')'] },
   { left: 'VarCallPrime', right: ['VarPrime'] },
   { left: 'VarPrime', right: ['[', 'Expression', ']'] },
-  { left: 'VarPrime', right: [null] },
+  { left: 'VarPrime', right: ['epsilon'] },
   { left: 'FactorPrime', right: ['(', 'Args', ')'] },
-  { left: 'FactorPrime', right: [null] },
+  { left: 'FactorPrime', right: ['epsilon'] },
   { left: 'FactorZegond', right: ['(', 'Expression', ')'] },
   { left: 'FactorZegond', right: ['NUM'] },
   { left: 'Args', right: ['ArgList'] },
-  { left: 'Args', right: [null] },
+  { left: 'Args', right: ['epsilon'] },
   { left: 'ArgList', right: ['Expression', 'ArgListPrime'] },
   { left: 'ArgListPrime', right: [',', 'Expression', 'ArgListPrime'] },
-  { left: 'ArgListPrime', right: [null] },
+  { left: 'ArgListPrime', right: ['epsilon'] },
   { left: 'SignedFactor', right: ['+', 'Factor'] },
   { left: 'SignedFactor', right: ['-', 'Factor'] },
   { left: 'SignedFactor', right: ['Factor'] },
@@ -559,13 +562,16 @@ grammar_rules =  [
 
 parsing_table = {}
 
+keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*']
+firstSetOfNonTerminals = {key: [key] for key in keys}
+
 def add_to_parsing_table(non_terminal, terminal, production):
-    if terminal is None :
-        terminal = 'epsilon'
+    # if terminal is None :
+    #     terminal = 'epsilon'
     if terminal == '\u0000' :
         terminal = '$'
-    if production is None :
-        production = 'epsilon'
+    # if production is None :
+    #     production = 'epsilon'
     if non_terminal not in parsing_table:
         parsing_table[non_terminal] = {}
     parsing_table[non_terminal][terminal] = production
@@ -574,16 +580,43 @@ def add_to_parsing_table(non_terminal, terminal, production):
 for rule in grammar_rules:
     A = rule['left'] 
     alpha = rule['right']
-    for symbol in first_sets[A]:
-        if symbol is not None: 
-            add_to_parsing_table(A, symbol, alpha)
+    if alpha[0] not in firstSetOfNonTerminals:
+            for symbol in first_sets[alpha[0]]:
+                if symbol == 'epsilon': 
+                    add_to_parsing_table(A, symbol, 'epsilon')
+                    for symbol in follow_sets[A]:
+                        add_to_parsing_table(A, symbol, alpha)
+                        if '\u0000' in symbol:
+                            add_to_parsing_table(A, '$', alpha)
+                else:   
+                    add_to_parsing_table(A, symbol, alpha)
 
-    if None in first_sets[A]: 
-        for symbol in follow_sets[A]:
-            add_to_parsing_table(A, symbol, alpha)
+            if None in first_sets[alpha[0]]: 
+                for symbol in follow_sets[A]:
+                    add_to_parsing_table(A, symbol, alpha)
 
-            if '\u0000' in symbol: 
-                add_to_parsing_table(A, '$', alpha)
+                    if '\u0000' in symbol: 
+                        add_to_parsing_table(A, '$', alpha)
+
+    else:
+
+        if alpha[0] is 'epsilon':
+            add_to_parsing_table(A, 'epsilon', alpha)
+            
+            for symbol in follow_sets[A]:
+                add_to_parsing_table(A, symbol, alpha)
+                if '\u0000' in symbol:
+                    add_to_parsing_table(A, '$', alpha)
+        else:
+            for symbol in firstSetOfNonTerminals[alpha[0]]:
+                add_to_parsing_table(A, symbol, alpha)
+            
+            if 'epsilon' in firstSetOfNonTerminals[alpha[0]]:
+                for symbol in follow_sets[A]:
+                    add_to_parsing_table(A, symbol, alpha)
+                    if '\u0000' in symbol:
+                        add_to_parsing_table(A, '$', alpha)
+
 
 
 

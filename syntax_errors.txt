@@ -1,1 +1,1 @@
-#3 : syntax error, illegal void
+#6 : syntax error, Unexpected EOF
