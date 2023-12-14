@@ -552,8 +552,7 @@ grammar_rules =  [
   { left: 'VarCallPrime', right: ['VarPrime'] },
   { left: 'VarPrime', right: ['[', 'Expression', ']'] },
   { left: 'VarPrime', right: ['epsilon'] },
-  { left: 'FactorPrime', right: ['(', 'Args', ')'] },
-  { left: 'FactorPrime', right: ['epsilon'] },
+
   { left: 'FactorZegond', right: ['(', 'Expression', ')'] },
   { left: 'FactorZegond', right: ['NUM'] },
   { left: 'Args', right: ['ArgList'] },
@@ -565,6 +564,8 @@ grammar_rules =  [
   { left: 'SignedFactor', right: ['-', 'Factor'] },
   { left: 'SignedFactor', right: ['Factor'] },
   { left: 'SignedFactorPrime', right: ['FactorPrime'] },
+  { left: 'FactorPrime', right: ['(', 'Args', ')'] },
+  { left: 'FactorPrime', right: ['epsilon'] },
   { left: 'SignedFactorZegond', right: ['+', 'Factor'] },
   { left: 'SignedFactorZegond', right: ['-', 'Factor'] },
   { left: 'SignedFactorZegond', right: ['FactorZegond'] }
@@ -593,8 +594,8 @@ for rule in grammar_rules:
     alpha = rule['right']
     if alpha[0] not in firstSetOfNonTerminals:
             for symbol in first_sets[alpha[0]]:
-                if symbol == 'epsilon': 
-                    add_to_parsing_table(A, symbol, 'epsilon')
+                if symbol == null : 
+                    add_to_parsing_table(A, 'epsilon', 'epsilon')
                     for symbol in follow_sets[A]:
                         add_to_parsing_table(A, symbol, alpha)
                         if '$' in symbol:
