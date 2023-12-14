@@ -541,8 +541,7 @@ grammar_rules =  [
   { left: 'VarCallPrime', right: ['VarPrime'] },
   { left: 'VarPrime', right: ['[', 'Expression', ']'] },
   { left: 'VarPrime', right: ['epsilon'] },
-  { left: 'FactorPrime', right: ['(', 'Args', ')'] },
-  { left: 'FactorPrime', right: ['epsilon'] },
+
   { left: 'FactorZegond', right: ['(', 'Expression', ')'] },
   { left: 'FactorZegond', right: ['NUM'] },
   { left: 'Args', right: ['ArgList'] },
@@ -554,6 +553,8 @@ grammar_rules =  [
   { left: 'SignedFactor', right: ['-', 'Factor'] },
   { left: 'SignedFactor', right: ['Factor'] },
   { left: 'SignedFactorPrime', right: ['FactorPrime'] },
+  { left: 'FactorPrime', right: ['(', 'Args', ')'] },
+  { left: 'FactorPrime', right: ['epsilon'] },
   { left: 'SignedFactorZegond', right: ['+', 'Factor'] },
   { left: 'SignedFactorZegond', right: ['-', 'Factor'] },
   { left: 'SignedFactorZegond', right: ['FactorZegond'] }
@@ -582,8 +583,8 @@ for rule in grammar_rules:
     alpha = rule['right']
     if alpha[0] not in firstSetOfNonTerminals:
             for symbol in first_sets[alpha[0]]:
-                if symbol == 'epsilon': 
-                    add_to_parsing_table(A, symbol, 'epsilon')
+                if symbol == null : 
+                    add_to_parsing_table(A, 'epsilon', 'epsilon')
                     for symbol in follow_sets[A]:
                         add_to_parsing_table(A, symbol, alpha)
                         if '\u0000' in symbol:
@@ -591,7 +592,7 @@ for rule in grammar_rules:
                 else:   
                     add_to_parsing_table(A, symbol, alpha)
 
-            if None in first_sets[alpha[0]]: 
+            if 'epsilon' in first_sets[alpha[0]]: 
                 for symbol in follow_sets[A]:
                     add_to_parsing_table(A, symbol, alpha)
 
@@ -600,7 +601,7 @@ for rule in grammar_rules:
 
     else:
 
-        if alpha[0] is 'epsilon':
+        if alpha[0] == 'epsilon':
             add_to_parsing_table(A, 'epsilon', alpha)
             
             for symbol in follow_sets[A]:
@@ -623,7 +624,7 @@ for rule in grammar_rules:
 def add_synch_to_parsing_table(parsing_table, follow_sets):
     for non_terminal, terminals in parsing_table.items():
         for f in follow_sets[non_terminal] :
-            if f not in terminals :
+            if f not in terminals  :
                 parsing_table[non_terminal][f] = 'synch'
 
 
