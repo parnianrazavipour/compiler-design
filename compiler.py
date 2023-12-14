@@ -467,10 +467,17 @@ follow_sets = data['followSets']
 
 for key , val in first_sets.items():
     for i in range(len(val)) :
-        if val[i] is None :
+        if val[i] == '\x00' :
+            val[i] = '$'
+        elif val[i] is None :
             val[i] = 'epsilon'
+        
+for key , val in follow_sets.items():
+    for i in range(len(val)) :
+        if val[i] == '\x00' :
+            val[i] = '$'
+        
 
-# print(first_sets)
 
 
 left = 'left'
@@ -572,7 +579,7 @@ firstSetOfNonTerminals = {key: [key] for key in keys}
 def add_to_parsing_table(non_terminal, terminal, production):
     if terminal is None :
         print("terminal :", terminal)
-    if terminal == '\u0000' :
+    if terminal == '$' :
         terminal = '$'
     if production is None :
         production = 'epsilon'
@@ -590,7 +597,7 @@ for rule in grammar_rules:
                     add_to_parsing_table(A, symbol, 'epsilon')
                     for symbol in follow_sets[A]:
                         add_to_parsing_table(A, symbol, alpha)
-                        if '\u0000' in symbol:
+                        if '$' in symbol:
                             add_to_parsing_table(A, '$', alpha)
                 else:   
                     add_to_parsing_table(A, symbol, alpha)
@@ -599,7 +606,7 @@ for rule in grammar_rules:
                 for symbol in follow_sets[A]:
                     add_to_parsing_table(A, symbol, alpha)
 
-                    if '\u0000' in symbol: 
+                    if '$' in symbol: 
                         add_to_parsing_table(A, '$', alpha)
 
     else:
@@ -609,7 +616,7 @@ for rule in grammar_rules:
             
             for symbol in follow_sets[A]:
                 add_to_parsing_table(A, symbol, alpha)
-                if '\u0000' in symbol:
+                if '$' in symbol:
                     add_to_parsing_table(A, '$', alpha)
         else:
             for symbol in firstSetOfNonTerminals[alpha[0]]:
@@ -618,7 +625,7 @@ for rule in grammar_rules:
             if 'epsilon' in firstSetOfNonTerminals[alpha[0]]:
                 for symbol in follow_sets[A]:
                     add_to_parsing_table(A, symbol, alpha)
-                    if '\u0000' in symbol:
+                    if '$' in symbol:
                         add_to_parsing_table(A, '$', alpha)
 
 
@@ -627,7 +634,9 @@ for rule in grammar_rules:
 def add_synch_to_parsing_table(parsing_table, follow_sets):
     for non_terminal, terminals in parsing_table.items():
         for f in follow_sets[non_terminal] :
+
             if f not in terminals :
+
                 parsing_table[non_terminal][f] = 'synch'
 
 
@@ -639,9 +648,9 @@ add_synch_to_parsing_table(parsing_table, follow_sets)
 # print(parsing_table)
 
 print(parsing_table['Program'])
-# df = pd.DataFrame.from_dict(parsing_table, orient='index').fillna('')
-# output_path = 'parsing_table.csv'
-# df.to_csv(output_path, index=True)
+df = pd.DataFrame.from_dict(parsing_table, orient='index').fillna('')
+output_path = 'parsing_table.csv'
+df.to_csv(output_path, index=True)
 
 
 token_lists = defaultdict(list)
