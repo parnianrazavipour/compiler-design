@@ -465,14 +465,14 @@ follow_sets = data['followSets']
 
 for key , val in first_sets.items():
     for i in range(len(val)) :
-        if val[i] == '\x00' :
+        if val[i] == "\u0000" :
             val[i] = '$'
         elif val[i] is None :
             val[i] = 'epsilon'
         
 for key , val in follow_sets.items():
     for i in range(len(val)) :
-        if val[i] == '\x00' :
+        if val[i] == "\u0000" :
             val[i] = '$'
         
 
