@@ -280,7 +280,7 @@ def get_next_token(input_string ,current_ch  , dfa , temp) :
 
 
             if( dfa.states_type[dfa.current_state] == 'COMMENT' and ( dfa.current_state not in (dfa.accept_states or dfa.marked_accept_states))):
-                if(input_string[point2+1] == '\x00'):
+                if(input_string[point2+1] == '\u0000'):
                     first_of_comment = ''
                     if(len(input_string[point1:point2+1]) >= 7) :
                         first_of_comment = input_string[point1:point1+7]
@@ -334,7 +334,7 @@ def get_next_token(input_string ,current_ch  , dfa , temp) :
 def Scanner ( input_string , dfa ) :
 
     global point1, point2, line_number, line_comment_starts
-    input_string = input_string +'\x00'
+    input_string = input_string +'\u0000'
 
     while point1 != len(input_string) -1 :
         start_ch =input_string[point1]
@@ -575,59 +575,83 @@ parsing_table = {}
 keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*']
 firstSetOfNonTerminals = {key: [key] for key in keys}
 
+# def add_to_parsing_table(non_terminal, terminal, production):
+#     if terminal is None :
+#         print("terminal :", terminal)
+#     if terminal == '$' :
+#         terminal = '$'
+#     if production is None :
+#         production = 'epsilon'
+#     if non_terminal not in parsing_table:
+#         parsing_table[non_terminal] = {}
+#     parsing_table[non_terminal][terminal] = production
+
+
+# for rule in grammar_rules:
+#     A = rule['left'] 
+#     alpha = rule['right']
+#     if alpha[0] not in firstSetOfNonTerminals:
+#             for symbol in first_sets[alpha[0]]:
+#                 if symbol == null : 
+#                     for symbol in follow_sets[A]:
+#                         add_to_parsing_table(A, symbol, alpha)
+#                         if '$' in symbol:
+#                             add_to_parsing_table(A, '$', alpha)
+#                 else:   
+#                     add_to_parsing_table(A, symbol, alpha)
+
+#             if 'epsilon' in first_sets[alpha[0]]: 
+#                 for symbol in follow_sets[A]:
+#                     add_to_parsing_table(A, symbol, alpha)
+
+#                     if '$' in symbol: 
+#                         add_to_parsing_table(A, '$', alpha)
+
+#     else:
+
+#         if alpha[0] == 'epsilon':            
+#             for symbol in follow_sets[A]:
+#                 add_to_parsing_table(A, symbol, alpha)
+#                 if '$' in symbol:
+#                     add_to_parsing_table(A, '$', alpha)
+#         else:
+#             for symbol in firstSetOfNonTerminals[alpha[0]]:
+#                 add_to_parsing_table(A, symbol, alpha)
+            
+#             if 'epsilon' in firstSetOfNonTerminals[alpha[0]]:
+#                 for symbol in follow_sets[A]:
+#                     add_to_parsing_table(A, symbol, alpha)
+#                     if '$' in symbol:
+#                         add_to_parsing_table(A, '$', alpha)
+
 def add_to_parsing_table(non_terminal, terminal, production):
-    if terminal is None :
+    if terminal is None:
         print("terminal :", terminal)
-    if terminal == '$' :
+    if terminal == '$':
         terminal = '$'
-    if production is None :
+    if production is None:
         production = 'epsilon'
     if non_terminal not in parsing_table:
         parsing_table[non_terminal] = {}
     parsing_table[non_terminal][terminal] = production
 
-
 for rule in grammar_rules:
-    A = rule['left'] 
+    A = rule['left']
     alpha = rule['right']
-    if alpha[0] not in firstSetOfNonTerminals:
-            for symbol in first_sets[alpha[0]]:
-                if symbol == null : 
-                    add_to_parsing_table(A, 'epsilon', 'epsilon')
-                    for symbol in follow_sets[A]:
-                        add_to_parsing_table(A, symbol, alpha)
-                        if '$' in symbol:
-                            add_to_parsing_table(A, '$', alpha)
-                else:   
-                    add_to_parsing_table(A, symbol, alpha)
 
-            if 'epsilon' in first_sets[alpha[0]]: 
-                for symbol in follow_sets[A]:
-                    add_to_parsing_table(A, symbol, alpha)
-
-                    if '$' in symbol: 
-                        add_to_parsing_table(A, '$', alpha)
-
-    else:
-
-        if alpha[0] == 'epsilon':
-            add_to_parsing_table(A, 'epsilon', alpha)
-            
-            for symbol in follow_sets[A]:
-                add_to_parsing_table(A, symbol, alpha)
-                if '$' in symbol:
+    first_of_alpha = first_sets[alpha[0]] if alpha[0] in first_sets else firstSetOfNonTerminals[alpha[0]]
+    
+    for symbol in first_of_alpha:
+        if symbol == 'epsilon':
+            # If 'epsilon' is in the first set of alpha, add productions for follow set of A
+            for follow_symbol in follow_sets[A]:
+                add_to_parsing_table(A, follow_symbol, alpha)
+                if '$' in follow_symbol:
                     add_to_parsing_table(A, '$', alpha)
         else:
-            for symbol in firstSetOfNonTerminals[alpha[0]]:
-                add_to_parsing_table(A, symbol, alpha)
-            
-            if 'epsilon' in firstSetOfNonTerminals[alpha[0]]:
-                for symbol in follow_sets[A]:
-                    add_to_parsing_table(A, symbol, alpha)
-                    if '$' in symbol:
-                        add_to_parsing_table(A, '$', alpha)
-
-
+            add_to_parsing_table(A, symbol, alpha)
+            if '$' in symbol:
+                add_to_parsing_table(A, '$', alpha)
 
 
 def add_synch_to_parsing_table(parsing_table, follow_sets):
