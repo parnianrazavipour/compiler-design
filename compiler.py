@@ -702,8 +702,8 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
             errors.append(f"#{line_num} : syntax error, illegal {token}")
             index += 1 
 
-    if not errors and stack:
-        Node('$', parent=root)
+    # if not errors and stack:
+    Node('$', parent=root)
 
     with open('parse_tree.txt', 'w') as file:
         for pre, fill, node in RenderTree(root):
