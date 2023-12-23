@@ -1,10 +1,18 @@
-/* sample 2 */
+/* sample 10 */
 
-int add(int a, int b) {
-    return a + b;
+int func(int a[]){
+    int b;
+	return a[b+1] + b;
 }
 
-void main(void) {
-    int result;
-    result = add(3, 7);
+void main(void){
+	int a[10];
+	int b[10];
+	a[0] =1;
+	if (a[0] < 5) {
+		b = fun(a);
+	}
+	else {
+		b = func(b);
+	}
 }

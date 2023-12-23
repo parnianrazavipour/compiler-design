@@ -606,9 +606,10 @@ for rule in grammar_rules:
 
     # Add rules to the parsing table
     for symbol in first_of_alpha:
-        add_to_parsing_table(A, symbol, alpha)
-        if '$' in symbol:
-            add_to_parsing_table(A, '$', alpha)
+        if symbol != 'epsilon':
+            add_to_parsing_table(A, symbol, alpha)
+            if '$' in symbol:
+                add_to_parsing_table(A, '$', alpha)
 
     # Handle epsilon transitions
     if 'epsilon' in first_of_alpha:
@@ -616,10 +617,10 @@ for rule in grammar_rules:
             add_to_parsing_table(A, follow_symbol, ['epsilon'])
 
 
+
 def add_synch_to_parsing_table(parsing_table, follow_sets):
     for non_terminal, terminals in parsing_table.items():
         for f in follow_sets[non_terminal] :
-
             if f not in terminals :
 
                 parsing_table[non_terminal][f] = 'synch'
@@ -739,3 +740,5 @@ for error in parse_errors:
 with open('syntax_errors.txt', 'w') as error_file:
     for error in parse_errors:
         error_file.write(error + '\n')
+    if len(parse_errors) == 0:
+        error_file.write('There is no syntax error.' + '\n')
