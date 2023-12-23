@@ -1,1 +1,2 @@
-#11 : syntax error, missing Params
+#10 : syntax error, illegal return
+#10 : syntax error, illegal NUM

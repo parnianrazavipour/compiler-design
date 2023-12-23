@@ -692,13 +692,15 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
 
         elif top == 'epsilon':
             Node('epsilon', parent=current_node)
-        elif parsing_table[top][token] == 'synch':
+        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] == 'synch':
             errors.append(f"#{line_num} : syntax error, missing {top}")
-        elif top != token:
+
+        elif (top not in parsing_table) or (token not in parsing_table[top]) :
             errors.append(f"#{line_num} : syntax error, illegal {token}")
             index += 1 
-        else:
-            errors.append(f"#{line_num} : syntax error at {token}")
+        elif  top != token:
+            errors.append(f"#{line_num} : syntax error, illegal {token}")
+            index += 1 
 
     if not errors and stack:
         Node('$', parent=root)

@@ -1,12 +1,12 @@
 {
   "firstSets": {
     "Program": [
-      "epsilon",
+      null,
       "int",
       "void"
     ],
     "DeclarationList": [
-      "epsilon",
+      null,
       "int",
       "void"
     ],
@@ -40,7 +40,7 @@
     ],
     "ParamList": [
       ",",
-      "epsilon"
+      null
     ],
     "Param": [
       "int",
@@ -48,13 +48,13 @@
     ],
     "ParamPrime": [
       "[",
-      "epsilon"
+      null
     ],
     "CompoundStmt": [
       "{"
     ],
     "StatementList": [
-      "epsilon",
+      null,
       "{",
       "break",
       ";",
@@ -117,12 +117,21 @@
       "=",
       "[",
       "(",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      null
     ],
     "H": [
       "=",
       "*",
-      "epsilon"
+      null,
+      "+",
+      "-",
+      "<",
+      "=="
     ],
     "SimpleExpressionZegond": [
       "+",
@@ -132,10 +141,15 @@
     ],
     "SimpleExpressionPrime": [
       "(",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      null
     ],
     "C": [
-      "epsilon",
+      null,
       "<",
       "=="
     ],
@@ -152,7 +166,10 @@
     ],
     "AdditiveExpressionPrime": [
       "(",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      null
     ],
     "AdditiveExpressionZegond": [
       "+",
@@ -161,7 +178,7 @@
       "NUM"
     ],
     "D": [
-      "epsilon",
+      null,
       "+",
       "-"
     ],
@@ -178,7 +195,8 @@
     ],
     "TermPrime": [
       "(",
-      "epsilon"
+      "*",
+      null
     ],
     "TermZegond": [
       "+",
@@ -188,7 +206,7 @@
     ],
     "G": [
       "*",
-      "epsilon"
+      null
     ],
     "Factor": [
       "(",
@@ -198,18 +216,22 @@
     "VarCallPrime": [
       "(",
       "[",
-      "epsilon"
+      null
     ],
     "VarPrime": [
       "[",
-      "epsilon"
+      null
+    ],
+    "FactorPrime": [
+      "(",
+      null
     ],
     "FactorZegond": [
       "(",
       "NUM"
     ],
     "Args": [
-      "epsilon",
+      null,
       "ID",
       "+",
       "-",
@@ -225,7 +247,7 @@
     ],
     "ArgListPrime": [
       ",",
-      "epsilon"
+      null
     ],
     "SignedFactor": [
       "+",
@@ -236,11 +258,7 @@
     ],
     "SignedFactorPrime": [
       "(",
-      "epsilon"
-    ],
-    "FactorPrime": [
-      "(",
-      "epsilon"
+      null
     ],
     "SignedFactorZegond": [
       "+",
@@ -255,7 +273,6 @@
     ],
     "DeclarationList": [
       "\u0000",
-      "epsilon",
       "{",
       "break",
       ";",
@@ -266,33 +283,83 @@
       "+",
       "-",
       "(",
-      "NUM"
+      "NUM",
+      "}"
     ],
     "Declaration": [
-      "epsilon",
       "int",
-      "void"
+      "void",
+      "\u0000",
+      "{",
+      "break",
+      ";",
+      "if",
+      "while",
+      "return",
+      "ID",
+      "+",
+      "-",
+      "(",
+      "NUM",
+      "}"
     ],
     "DeclarationInitial": [
       "(",
       ";",
       "[",
-      "epsilon"
+      ",",
+      ")"
     ],
     "DeclarationPrime": [
-      "epsilon",
       "int",
-      "void"
+      "void",
+      "\u0000",
+      "{",
+      "break",
+      ";",
+      "if",
+      "while",
+      "return",
+      "ID",
+      "+",
+      "-",
+      "(",
+      "NUM",
+      "}"
     ],
     "VarDeclarationPrime": [
-      "epsilon",
       "int",
-      "void"
+      "void",
+      "\u0000",
+      "{",
+      "break",
+      ";",
+      "if",
+      "while",
+      "return",
+      "ID",
+      "+",
+      "-",
+      "(",
+      "NUM",
+      "}"
     ],
     "FunDeclarationPrime": [
-      "epsilon",
       "int",
-      "void"
+      "void",
+      "\u0000",
+      "{",
+      "break",
+      ";",
+      "if",
+      "while",
+      "return",
+      "ID",
+      "+",
+      "-",
+      "(",
+      "NUM",
+      "}"
     ],
     "TypeSpecifier": [
       "ID"
@@ -305,16 +372,16 @@
     ],
     "Param": [
       ",",
-      "epsilon"
+      ")"
     ],
     "ParamPrime": [
       ",",
-      "epsilon"
+      ")"
     ],
     "CompoundStmt": [
-      "epsilon",
       "int",
       "void",
+      "\u0000",
       "{",
       "break",
       ";",
@@ -326,13 +393,13 @@
       "-",
       "(",
       "NUM",
+      "}",
       "else"
     ],
     "StatementList": [
       "}"
     ],
     "Statement": [
-      "epsilon",
       "{",
       "break",
       ";",
@@ -344,10 +411,10 @@
       "-",
       "(",
       "NUM",
+      "}",
       "else"
     ],
     "ExpressionStmt": [
-      "epsilon",
       "{",
       "break",
       ";",
@@ -359,10 +426,10 @@
       "-",
       "(",
       "NUM",
+      "}",
       "else"
     ],
     "SelectionStmt": [
-      "epsilon",
       "{",
       "break",
       ";",
@@ -374,10 +441,10 @@
       "-",
       "(",
       "NUM",
+      "}",
       "else"
     ],
     "IterationStmt": [
-      "epsilon",
       "{",
       "break",
       ";",
@@ -389,10 +456,10 @@
       "-",
       "(",
       "NUM",
+      "}",
       "else"
     ],
     "ReturnStmt": [
-      "epsilon",
       "{",
       "break",
       ";",
@@ -404,10 +471,10 @@
       "-",
       "(",
       "NUM",
+      "}",
       "else"
     ],
     "ReturnStmtPrime": [
-      "epsilon",
       "{",
       "break",
       ";",
@@ -419,49 +486,44 @@
       "-",
       "(",
       "NUM",
+      "}",
       "else"
     ],
     "Expression": [
       ";",
       ")",
       "]",
-      ",",
-      "epsilon"
+      ","
     ],
     "B": [
       ";",
       ")",
       "]",
-      ",",
-      "epsilon"
+      ","
     ],
     "H": [
       ";",
       ")",
       "]",
-      ",",
-      "epsilon"
+      ","
     ],
     "SimpleExpressionZegond": [
       ";",
       ")",
       "]",
-      ",",
-      "epsilon"
+      ","
     ],
     "SimpleExpressionPrime": [
       ";",
       ")",
       "]",
-      ",",
-      "epsilon"
+      ","
     ],
     "C": [
       ";",
       ")",
       "]",
-      ",",
-      "epsilon"
+      ","
     ],
     "Relop": [
       "+",
@@ -474,21 +536,25 @@
       ";",
       ")",
       "]",
-      ",",
-      "epsilon"
+      ","
     ],
     "AdditiveExpressionPrime": [
-      "epsilon",
       "<",
-      "=="
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "AdditiveExpressionZegond": [
-      "epsilon",
       "<",
-      "=="
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "D": [
-      "epsilon",
       "<",
       "==",
       ";",
@@ -504,40 +570,99 @@
       "NUM"
     ],
     "Term": [
-      "epsilon",
       "+",
-      "-"
+      "-",
+      ";",
+      ")",
+      "<",
+      "==",
+      "]",
+      ","
     ],
     "TermPrime": [
-      "epsilon",
       "+",
-      "-"
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "TermZegond": [
-      "epsilon",
       "+",
-      "-"
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "G": [
-      "epsilon",
       "+",
-      "-"
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "Factor": [
       "*",
-      "epsilon"
+      "+",
+      "-",
+      ";",
+      ")",
+      "<",
+      "==",
+      "]",
+      ","
     ],
     "VarCallPrime": [
       "*",
-      "epsilon"
+      "+",
+      "-",
+      ";",
+      ")",
+      "<",
+      "==",
+      "]",
+      ","
     ],
     "VarPrime": [
       "*",
-      "epsilon"
+      "+",
+      "-",
+      ";",
+      ")",
+      "<",
+      "==",
+      "]",
+      ","
+    ],
+    "FactorPrime": [
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "FactorZegond": [
       "*",
-      "epsilon"
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "Args": [
       ")"
@@ -550,33 +675,62 @@
     ],
     "SignedFactor": [
       "*",
-      "epsilon"
+      "+",
+      "-",
+      ";",
+      ")",
+      "<",
+      "==",
+      "]",
+      ","
     ],
     "SignedFactorPrime": [
       "*",
-      "epsilon"
-    ],
-    "FactorPrime": [
-      "*",
-      "epsilon"
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "SignedFactorZegond": [
       "*",
-      "epsilon"
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ]
   },
   "predictSets": {
     "1": [
-      "epsilon",
       "int",
-      "void"
+      "void",
+      "\u0000"
     ],
     "2": [
       "int",
       "void"
     ],
     "3": [
-      "epsilon"
+      "\u0000",
+      "{",
+      "break",
+      ";",
+      "if",
+      "while",
+      "return",
+      "ID",
+      "+",
+      "-",
+      "(",
+      "NUM",
+      "}"
     ],
     "4": [
       "int",
@@ -618,7 +772,7 @@
       ","
     ],
     "16": [
-      "epsilon"
+      ")"
     ],
     "17": [
       "int",
@@ -628,7 +782,8 @@
       "["
     ],
     "19": [
-      "epsilon"
+      ",",
+      ")"
     ],
     "20": [
       "{"
@@ -647,7 +802,7 @@
       "NUM"
     ],
     "22": [
-      "epsilon"
+      "}"
     ],
     "23": [
       "break",
@@ -719,14 +874,29 @@
     ],
     "40": [
       "(",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "41": [
       "="
     ],
     "42": [
       "*",
-      "epsilon"
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "43": [
       "+",
@@ -736,14 +906,25 @@
     ],
     "44": [
       "(",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "45": [
       "<",
       "=="
     ],
     "46": [
-      "epsilon"
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "47": [
       "<"
@@ -760,7 +941,15 @@
     ],
     "50": [
       "(",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "51": [
       "+",
@@ -773,7 +962,12 @@
       "-"
     ],
     "53": [
-      "epsilon"
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "54": [
       "+"
@@ -790,7 +984,15 @@
     ],
     "57": [
       "(",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "58": [
       "+",
@@ -802,7 +1004,14 @@
       "*"
     ],
     "60": [
-      "epsilon"
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "61": [
       "("
@@ -818,29 +1027,49 @@
     ],
     "65": [
       "[",
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      ";",
+      ")",
+      "<",
+      "==",
+      "]",
+      ","
     ],
     "66": [
       "["
     ],
     "67": [
-      "epsilon"
+      "*",
+      "+",
+      "-",
+      ";",
+      ")",
+      "<",
+      "==",
+      "]",
+      ","
     ],
     "68": [
       "("
     ],
     "69": [
-      "NUM"
-    ],
-    "70": [
-      "ID",
+      "*",
       "+",
       "-",
-      "(",
-      "NUM"
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
+    ],
+    "70": [
+      "("
     ],
     "71": [
-      "epsilon"
+      "NUM"
     ],
     "72": [
       "ID",
@@ -850,31 +1079,43 @@
       "NUM"
     ],
     "73": [
-      ","
+      ")"
     ],
     "74": [
-      "epsilon"
+      "ID",
+      "+",
+      "-",
+      "(",
+      "NUM"
     ],
     "75": [
-      "+"
+      ","
     ],
     "76": [
-      "-"
+      ")"
     ],
     "77": [
+      "+"
+    ],
+    "78": [
+      "-"
+    ],
+    "79": [
       "(",
       "ID",
       "NUM"
     ],
-    "78": [
-      "(",
-      "epsilon"
-    ],
-    "79": [
-      "("
-    ],
     "80": [
-      "epsilon"
+      "(",
+      "*",
+      "+",
+      "-",
+      "<",
+      "==",
+      ";",
+      ")",
+      "]",
+      ","
     ],
     "81": [
       "+"
