@@ -542,7 +542,7 @@ grammar_rules =  [
   { left: 'Term', right: ['SignedFactor', 'G'] },
   { left: 'TermPrime', right: ['SignedFactorPrime', 'G'] },
   { left: 'TermZegond', right: ['SignedFactorZegond', 'G'] },
-  { left: 'G', right: ['*', 'Factor', 'G'] },
+  { left: 'G', right: ['*', 'SignedFactor', 'G'] },
   { left: 'G', right: ['epsilon'] },
   { left: 'Factor', right: ['(', 'Expression', ')'] },
   { left: 'Factor', right: ['ID', 'VarCallPrime'] },
