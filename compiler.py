@@ -4,16 +4,17 @@ import json
 import pandas as pd
 import json
 from collections import defaultdict
+from anytree import Node, RenderTree
 
 
 
-class ParseTreeNode:
-    def __init__(self, symbol):
-        self.symbol = symbol
-        self.children = []
+# class ParseTreeNode:
+#     def __init__(self, symbol):
+#         self.symbol = symbol
+#         self.children = []
 
-    def add_child(self, child_node):
-        self.children.append(child_node)
+#     def add_child(self, child_node):
+#         self.children.append(child_node)
 
 
 white_space = [' ' , '  ','\r','\n','\t','\f','\v']
@@ -645,93 +646,71 @@ print(token_lists)
 
 
 
+from anytree import Node, RenderTree
 def parse(token_lists, parsing_table, first_sets, follow_sets):
-    stack = ['Program']
-    parse_tree_root = ParseTreeNode('Program')
-    current_node = parse_tree_root
+    root = Node('Program')
+    stack = [('Program', root)]
     errors = []
 
-    # Flatten the token lists while maintaining line numbers
     flat_token_list = [(line_num, token) for line_num, tokens in sorted(token_lists.items()) for token in tokens]
 
     index = 0
     while stack and index < len(flat_token_list):
         line_num, (token_type, token_value) = flat_token_list[index]
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
-        print("stack = ", stack,"token = ", token)
 
-        top = stack.pop()
+        top, current_node = stack.pop()
         if top == token:
-            # Match found, move to the next token
-            print('token ', top , 'matched')
-            new_node = ParseTreeNode(token)
-            current_node.add_child(new_node)
-            current_node = new_node  
+            Node(f"({token_type}, {token_value})", parent=current_node)
             index += 1
-        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token]!= None :
+        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] != None:
             production = parsing_table[top][token]
-            # Create a new node in the parse tree
-            new_node = ParseTreeNode(top)
-            current_node.add_child(new_node)
+            # Avoid creating a second 'Program' node
+            if top != 'Program':
+                new_node = Node(top, parent=current_node)
 
-            if production != 'epsilon':
-                print("push the production = ", production)
-                stack.extend(production[::-1])  # Push the production in reverse order to the stack
-                # Add children nodes for each symbol in the production
-                for symbol in production:
-                    child_node = ParseTreeNode(symbol)
-                    new_node.add_child(child_node)
-                    if symbol in first_sets and 'epsilon' in first_sets[symbol]:
-                        # If symbol can produce epsilon, add epsilon as a child node
-                        epsilon_node = ParseTreeNode('epsilon')
-                        child_node.add_child(epsilon_node)
-            else:
-                # If production is epsilon, add epsilon as a child node
-                epsilon_node = ParseTreeNode('epsilon')
-                new_node.add_child(epsilon_node)
+            for symbol in reversed(production):
+                stack.append((symbol, new_node if top != 'Program' else root))
 
-            # Move to the new node unless the production is epsilon
-            if production != 'epsilon':
-                current_node = new_node
+            if production == 'epsilon':
+                Node('epsilon', parent=new_node if top != 'Program' else root)
 
         elif top == 'epsilon':
-            # If the top is epsilon, simply discard it and continue
-            print("skipped epsilon")
-            continue
+            Node('epsilon', parent=current_node)
         elif parsing_table[top][token] == 'synch':
-            # Error recovery: pop the stack if top is in follow set of token
             errors.append(f"#{line_num} : syntax error, missing {top}")
         elif top != token:
-            # If it's a terminal symbol that doesn't match the input token
             errors.append(f"#{line_num} : syntax error, illegal {token}")
-            index += 1  # Skip the token
+            index += 1 
         else:
-            # If it's a non-terminal and we don't have a rule for the current token
             errors.append(f"#{line_num} : syntax error at {token}")
-            # Do not advance the token index, hoping for a better match in the following iterations
 
-    # Check for any remaining tokens or stack symbols that were not processed
-    if stack:
-        errors.append(f"#{line_num} : syntax error, Unexpected EOF")
+    if not errors and stack:
+        Node('$', parent=root)
 
-    return parse_tree_root, errors
+    with open('parse_tree.txt', 'w') as file:
+        for pre, fill, node in RenderTree(root):
+            file.write("%s%s\n" % (pre, node.name))
 
-# Now call the parse function with the token list
+    return root, errors
+
+
+# # Now call the parse function with the token list
 parse_tree, parse_errors = parse(token_lists, parsing_table, first_sets, follow_sets)
 
 
 
-def write_parse_tree(node, file, depth=0, last=True):
-    prefix = "└── " if last else "├── "
-    if node.symbol != 'epsilon' or (node.symbol == 'epsilon' and depth > 0):
-        # Only write the epsilon if it's not the root node
-        file.write('    ' * depth + (prefix if depth else '') + node.symbol + '\n')
-    for i, child in enumerate(node.children):
-        write_parse_tree(child, file, depth + 1, i == len(node.children) - 1)
+# def write_parse_tree(node, file, depth=0, last=True):
+#     prefix = "└── " if last else "├── "
+#     if node.symbol != 'epsilon' or (node.symbol == 'epsilon' and depth > 0):
+#         # Only write the epsilon if it's not the root node
+#         file.write('    ' * depth + (prefix if depth else '') + node.symbol + '\n')
+#     for i, child in enumerate(node.children):
+#         write_parse_tree(child, file, depth + 1, i == len(node.children) - 1)
 
 # Use the function to write the parse tree to 'parse_tree.txt'
-with open('parse_tree.txt', 'w') as file:
-    write_parse_tree(parse_tree, file)
+# with open('parse_tree.txt', 'w') as file:
+#     write_parse_tree(parse_tree, file)
 
 
 

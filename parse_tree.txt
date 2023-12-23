@@ -1,108 +1,52 @@
 Program
-    └── Program
-        ├── DeclarationList
-            └── epsilon
-        └── DeclarationList
-            ├── Declaration
-            ├── DeclarationList
-                └── epsilon
-            └── Declaration
-                ├── DeclarationInitial
-                ├── DeclarationPrime
-                └── DeclarationInitial
-                    ├── TypeSpecifier
-                    ├── ID
-                    └── TypeSpecifier
-                        ├── void
-                        └── void
-                            └── ID
-                                └── DeclarationPrime
-                                    ├── FunDeclarationPrime
-                                    └── FunDeclarationPrime
-                                        ├── (
-                                        ├── Params
-                                        ├── )
-                                        ├── CompoundStmt
-                                        └── (
-                                            └── Params
-                                                ├── void
-                                                └── void
-                                                    └── )
-                                                        └── CompoundStmt
-                                                            ├── {
-                                                            ├── DeclarationList
-                                                                └── epsilon
-                                                            ├── StatementList
-                                                                └── epsilon
-                                                            ├── }
-                                                            └── {
-                                                                └── DeclarationList
-                                                                    ├── Declaration
-                                                                    ├── DeclarationList
-                                                                        └── epsilon
-                                                                    └── Declaration
-                                                                        ├── DeclarationInitial
-                                                                        ├── DeclarationPrime
-                                                                        └── DeclarationInitial
-                                                                            ├── TypeSpecifier
-                                                                            ├── ID
-                                                                            └── TypeSpecifier
-                                                                                ├── int
-                                                                                └── int
-                                                                                    └── ID
-                                                                                        └── DeclarationPrime
-                                                                                            ├── VarDeclarationPrime
-                                                                                            └── VarDeclarationPrime
-                                                                                                ├── ;
-                                                                                                └── ;
-                                                                                                    └── DeclarationList
-                                                                                                        ├── epsilon
-                                                                                                        └── StatementList
-                                                                                                            ├── Statement
-                                                                                                            ├── StatementList
-                                                                                                                └── epsilon
-                                                                                                            └── Statement
-                                                                                                                ├── ExpressionStmt
-                                                                                                                └── ExpressionStmt
-                                                                                                                    ├── Expression
-                                                                                                                    ├── ;
-                                                                                                                    └── Expression
-                                                                                                                        ├── ID
-                                                                                                                        ├── B
-                                                                                                                            └── epsilon
-                                                                                                                        └── ID
-                                                                                                                            └── B
-                                                                                                                                ├── =
-                                                                                                                                ├── Expression
-                                                                                                                                └── =
-                                                                                                                                    └── Expression
-                                                                                                                                        ├── SimpleExpressionZegond
-                                                                                                                                        └── SimpleExpressionZegond
-                                                                                                                                            ├── AdditiveExpressionZegond
-                                                                                                                                            ├── C
-                                                                                                                                                └── epsilon
-                                                                                                                                            └── AdditiveExpressionZegond
-                                                                                                                                                ├── TermZegond
-                                                                                                                                                ├── D
-                                                                                                                                                    └── epsilon
-                                                                                                                                                └── TermZegond
-                                                                                                                                                    ├── SignedFactorZegond
-                                                                                                                                                    ├── G
-                                                                                                                                                        └── epsilon
-                                                                                                                                                    └── SignedFactorZegond
-                                                                                                                                                        ├── FactorZegond
-                                                                                                                                                        └── FactorZegond
-                                                                                                                                                            ├── NUM
-                                                                                                                                                            └── NUM
-                                                                                                                                                                └── G
-                                                                                                                                                                    ├── epsilon
-                                                                                                                                                                    └── D
-                                                                                                                                                                        ├── epsilon
-                                                                                                                                                                        └── C
-                                                                                                                                                                            ├── epsilon
-                                                                                                                                                                            └── ;
-                                                                                                                                                                                └── StatementList
-                                                                                                                                                                                    ├── epsilon
-                                                                                                                                                                                    └── }
-                                                                                                                                                                                        └── DeclarationList
-                                                                                                                                                                                            └── epsilon
+└── DeclarationList
+    ├── Declaration
+    │   ├── DeclarationInitial
+    │   │   ├── TypeSpecifier
+    │   │   │   └── (KEYWORD, void)
+    │   │   └── (ID, main)
+    │   └── DeclarationPrime
+    │       └── FunDeclarationPrime
+    │           ├── (SYMBOL, ()
+    │           ├── Params
+    │           │   └── (KEYWORD, void)
+    │           ├── (SYMBOL, ))
+    │           └── CompoundStmt
+    │               ├── (SYMBOL, {)
+    │               ├── DeclarationList
+    │               │   ├── Declaration
+    │               │   │   ├── DeclarationInitial
+    │               │   │   │   ├── TypeSpecifier
+    │               │   │   │   │   └── (KEYWORD, int)
+    │               │   │   │   └── (ID, x)
+    │               │   │   └── DeclarationPrime
+    │               │   │       └── VarDeclarationPrime
+    │               │   │           └── (SYMBOL, ;)
+    │               │   └── DeclarationList
+    │               │       └── epsilon
+    │               ├── StatementList
+    │               │   ├── Statement
+    │               │   │   └── ExpressionStmt
+    │               │   │       ├── Expression
+    │               │   │       │   ├── (ID, x)
+    │               │   │       │   └── B
+    │               │   │       │       ├── (SYMBOL, =)
+    │               │   │       │       └── Expression
+    │               │   │       │           └── SimpleExpressionZegond
+    │               │   │       │               ├── AdditiveExpressionZegond
+    │               │   │       │               │   ├── TermZegond
+    │               │   │       │               │   │   ├── SignedFactorZegond
+    │               │   │       │               │   │   │   └── FactorZegond
+    │               │   │       │               │   │   │       └── (NUM, 10)
+    │               │   │       │               │   │   └── G
+    │               │   │       │               │   │       └── epsilon
+    │               │   │       │               │   └── D
+    │               │   │       │               │       └── epsilon
+    │               │   │       │               └── C
+    │               │   │       │                   └── epsilon
+    │               │   │       └── (SYMBOL, ;)
+    │               │   └── StatementList
+    │               │       └── epsilon
+    │               └── (SYMBOL, })
+    └── DeclarationList
+        └── epsilon
