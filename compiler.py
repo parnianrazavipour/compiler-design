@@ -592,19 +592,28 @@ for rule in grammar_rules:
     A = rule['left']
     alpha = rule['right']
 
-    first_of_alpha = first_sets[alpha[0]] if alpha[0] in first_sets else firstSetOfNonTerminals[alpha[0]]
-    
+    # Initially, get the first set of the first symbol
+    first_of_alpha = set(first_sets[alpha[0]] if alpha[0] in first_sets else firstSetOfNonTerminals[alpha[0]])
+
+    # Check if the first symbol can derive epsilon, then consider the next symbols
+    index = 0
+    while 'epsilon' in first_of_alpha and index + 1 < len(alpha):
+        first_of_alpha.remove('epsilon')
+        index += 1
+        next_symbol = alpha[index]
+        next_first = set(first_sets[next_symbol] if next_symbol in first_sets else firstSetOfNonTerminals[next_symbol])
+        first_of_alpha = first_of_alpha.union(next_first)
+
+    # Add rules to the parsing table
     for symbol in first_of_alpha:
-        if symbol == 'epsilon':
-            # If 'epsilon' is in the first set of alpha, add productions for follow set of A
-            for follow_symbol in follow_sets[A]:
-                add_to_parsing_table(A, follow_symbol, alpha)
-                if '$' in follow_symbol:
-                    add_to_parsing_table(A, '$', alpha)
-        else:
-            add_to_parsing_table(A, symbol, alpha)
-            if '$' in symbol:
-                add_to_parsing_table(A, '$', alpha)
+        add_to_parsing_table(A, symbol, alpha)
+        if '$' in symbol:
+            add_to_parsing_table(A, '$', alpha)
+
+    # Handle epsilon transitions
+    if 'epsilon' in first_of_alpha:
+        for follow_symbol in follow_sets[A]:
+            add_to_parsing_table(A, follow_symbol, ['epsilon'])
 
 
 def add_synch_to_parsing_table(parsing_table, follow_sets):
@@ -645,6 +654,9 @@ token_lists[last_number].append(('$','$'))
 print(token_lists)
 
 
+print("SimpleExpressionPrime" , parsing_table['SimpleExpressionPrime'])
+
+
 
 from anytree import Node, RenderTree
 def parse(token_lists, parsing_table, first_sets, follow_sets):
@@ -656,16 +668,19 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
 
     index = 0
     while stack and index < len(flat_token_list):
+
         line_num, (token_type, token_value) = flat_token_list[index]
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
-
+        print('token  = ', token)
+        print(' stack' , [x[0] for x in stack])
+        
         top, current_node = stack.pop()
         if top == token:
             Node(f"({token_type}, {token_value})", parent=current_node)
             index += 1
-        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] != None:
+        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] not in ['synch', None] and top != 'epsilon':
             production = parsing_table[top][token]
-            # Avoid creating a second 'Program' node
+            print("push production ",production )
             if top != 'Program':
                 new_node = Node(top, parent=current_node)
 
