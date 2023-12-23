@@ -575,54 +575,6 @@ parsing_table = {}
 keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*']
 firstSetOfNonTerminals = {key: [key] for key in keys}
 
-# def add_to_parsing_table(non_terminal, terminal, production):
-#     if terminal is None :
-#         print("terminal :", terminal)
-#     if terminal == '$' :
-#         terminal = '$'
-#     if production is None :
-#         production = 'epsilon'
-#     if non_terminal not in parsing_table:
-#         parsing_table[non_terminal] = {}
-#     parsing_table[non_terminal][terminal] = production
-
-
-# for rule in grammar_rules:
-#     A = rule['left'] 
-#     alpha = rule['right']
-#     if alpha[0] not in firstSetOfNonTerminals:
-#             for symbol in first_sets[alpha[0]]:
-#                 if symbol == null : 
-#                     for symbol in follow_sets[A]:
-#                         add_to_parsing_table(A, symbol, alpha)
-#                         if '$' in symbol:
-#                             add_to_parsing_table(A, '$', alpha)
-#                 else:   
-#                     add_to_parsing_table(A, symbol, alpha)
-
-#             if 'epsilon' in first_sets[alpha[0]]: 
-#                 for symbol in follow_sets[A]:
-#                     add_to_parsing_table(A, symbol, alpha)
-
-#                     if '$' in symbol: 
-#                         add_to_parsing_table(A, '$', alpha)
-
-#     else:
-
-#         if alpha[0] == 'epsilon':            
-#             for symbol in follow_sets[A]:
-#                 add_to_parsing_table(A, symbol, alpha)
-#                 if '$' in symbol:
-#                     add_to_parsing_table(A, '$', alpha)
-#         else:
-#             for symbol in firstSetOfNonTerminals[alpha[0]]:
-#                 add_to_parsing_table(A, symbol, alpha)
-            
-#             if 'epsilon' in firstSetOfNonTerminals[alpha[0]]:
-#                 for symbol in follow_sets[A]:
-#                     add_to_parsing_table(A, symbol, alpha)
-#                     if '$' in symbol:
-#                         add_to_parsing_table(A, '$', alpha)
 
 def add_to_parsing_table(non_terminal, terminal, production):
     if terminal is None:
@@ -692,15 +644,6 @@ token_lists[last_number].append(('$','$'))
 print(token_lists)
 
 
-# def print_parse_tree(node, depth=0, last=True):
-#     prefix = "└── " if last else "├── "
-#     if node.symbol != 'epsilon' or (node.symbol == 'epsilon' and depth > 0):
-#         # Only print the epsilon if it's not the root node
-#         print('    ' * depth + (prefix if depth else '') + node.symbol if depth else node.symbol)
-#     for i, child in enumerate(node.children):
-#         print_parse_tree(child, depth + 1, i == len(node.children) - 1)
-
-
 
 def parse(token_lists, parsing_table, first_sets, follow_sets):
     stack = ['Program']
@@ -715,21 +658,24 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     while stack and index < len(flat_token_list):
         line_num, (token_type, token_value) = flat_token_list[index]
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
+        print("stack = ", stack,"token = ", token)
 
         top = stack.pop()
         if top == token:
             # Match found, move to the next token
+            print('token ', top , 'matched')
             new_node = ParseTreeNode(token)
             current_node.add_child(new_node)
             current_node = new_node  
             index += 1
-        elif top in parsing_table and token in parsing_table[top]:
+        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token]!= None :
             production = parsing_table[top][token]
             # Create a new node in the parse tree
             new_node = ParseTreeNode(top)
             current_node.add_child(new_node)
 
             if production != 'epsilon':
+                print("push the production = ", production)
                 stack.extend(production[::-1])  # Push the production in reverse order to the stack
                 # Add children nodes for each symbol in the production
                 for symbol in production:
@@ -748,12 +694,13 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
             if production != 'epsilon':
                 current_node = new_node
 
-        elif top in follow_sets and token in follow_sets[top]:
-            # Error recovery: pop the stack if top is in follow set of token
-            errors.append(f"#{line_num} : syntax error, missing {top}")
         elif top == 'epsilon':
             # If the top is epsilon, simply discard it and continue
+            print("skipped epsilon")
             continue
+        elif parsing_table[top][token] == 'synch':
+            # Error recovery: pop the stack if top is in follow set of token
+            errors.append(f"#{line_num} : syntax error, missing {top}")
         elif top != token:
             # If it's a terminal symbol that doesn't match the input token
             errors.append(f"#{line_num} : syntax error, illegal {token}")

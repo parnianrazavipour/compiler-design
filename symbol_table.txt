@@ -1,9 +1,9 @@
-1.	void
-2.	x
-3.	return
-4.	if
-5.	int
+1.	return
+2.	if
+3.	main
+4.	break
+5.	void
 6.	else
 7.	while
-8.	main
-9.	break
+8.	int
+9.	x
