@@ -697,7 +697,10 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
             errors.append(f"#{line_num} : syntax error, missing {top}")
 
         elif (top not in parsing_table) or (token not in parsing_table[top]) :
-            errors.append(f"#{line_num} : syntax error, illegal {token}")
+            if ( token == '$' ) :
+                errors.append(f"#{line_num} : syntax error, Unexpected EOF")
+            else : 
+                errors.append(f"#{line_num} : syntax error, illegal {token}")
             index += 1 
             stack.insert(0,(top , current_node))
         elif  top != token:

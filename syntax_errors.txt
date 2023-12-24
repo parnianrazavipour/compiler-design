@@ -1,1 +1,7 @@
-There is no syntax error.
+#3 : syntax error, missing Params
+#11 : syntax error, illegal }
+#13 : syntax error, illegal int
+#13 : syntax error, illegal ID
+#15 : syntax error, illegal int
+#15 : syntax error, illegal ID
+#23 : syntax error, Unexpected EOF
