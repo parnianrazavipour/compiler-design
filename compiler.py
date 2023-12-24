@@ -614,7 +614,7 @@ for rule in grammar_rules:
     # Handle epsilon transitions
     if 'epsilon' in first_of_alpha:
         for follow_symbol in follow_sets[A]:
-            add_to_parsing_table(A, follow_symbol, ['epsilon'])
+            add_to_parsing_table(A, follow_symbol, alpha)
 
 
 

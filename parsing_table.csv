@@ -1,5 +1,5 @@
-,void,int,$,{,break,;,if,while,return,ID,+,-,(,NUM,},[,",",),else,],=,*,==,<
-Program,['DeclarationList'],['DeclarationList'],['epsilon'],,,,,,,,,,,,,,,,,,,,,
+,void,int,$,{,break,;,if,while,return,ID,+,-,(,NUM,},[,",",),else,],=,==,*,<
+Program,['DeclarationList'],['DeclarationList'],['DeclarationList'],,,,,,,,,,,,,,,,,,,,,
 DeclarationList,"['Declaration', 'DeclarationList']","['Declaration', 'DeclarationList']",['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],,,,,,,,,
 Declaration,"['DeclarationInitial', 'DeclarationPrime']","['DeclarationInitial', 'DeclarationPrime']",synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,,,,,,,,,
 DeclarationInitial,"['TypeSpecifier', 'ID']","['TypeSpecifier', 'ID']",,,,synch,,,,,,,synch,,,synch,synch,synch,,,,,,
@@ -18,28 +18,28 @@ IterationStmt,,,,synch,synch,synch,synch,"['while', '(', 'Expression', ')', 'Sta
 ReturnStmt,,,,synch,synch,synch,synch,synch,"['return', 'ReturnStmtPrime']",synch,synch,synch,synch,synch,synch,,,,synch,,,,,
 ReturnStmtPrime,,,,synch,synch,[';'],synch,synch,synch,"['Expression', ';']","['Expression', ';']","['Expression', ';']","['Expression', ';']","['Expression', ';']",synch,,,,synch,,,,,
 Expression,,,,,,synch,,,,"['ID', 'B']",['SimpleExpressionZegond'],['SimpleExpressionZegond'],['SimpleExpressionZegond'],['SimpleExpressionZegond'],,,synch,synch,,synch,,,,
-B,,,,,,['epsilon'],,,,,['SimpleExpressionPrime'],['SimpleExpressionPrime'],['SimpleExpressionPrime'],,,"['[', 'Expression', ']', 'H']",['epsilon'],['epsilon'],,['epsilon'],"['=', 'Expression']",['SimpleExpressionPrime'],['SimpleExpressionPrime'],['SimpleExpressionPrime']
-H,,,,,,['epsilon'],,,,,"['G', 'D', 'C']","['G', 'D', 'C']",,,,,['epsilon'],['epsilon'],,['epsilon'],"['=', 'Expression']","['G', 'D', 'C']","['G', 'D', 'C']","['G', 'D', 'C']"
+B,,,,,,['SimpleExpressionPrime'],,,,,['SimpleExpressionPrime'],['SimpleExpressionPrime'],['SimpleExpressionPrime'],,,"['[', 'Expression', ']', 'H']",['SimpleExpressionPrime'],['SimpleExpressionPrime'],,['SimpleExpressionPrime'],"['=', 'Expression']",['SimpleExpressionPrime'],['SimpleExpressionPrime'],['SimpleExpressionPrime']
+H,,,,,,"['G', 'D', 'C']",,,,,"['G', 'D', 'C']","['G', 'D', 'C']",,,,,"['G', 'D', 'C']","['G', 'D', 'C']",,"['G', 'D', 'C']","['=', 'Expression']","['G', 'D', 'C']","['G', 'D', 'C']","['G', 'D', 'C']"
 SimpleExpressionZegond,,,,,,synch,,,,,"['AdditiveExpressionZegond', 'C']","['AdditiveExpressionZegond', 'C']","['AdditiveExpressionZegond', 'C']","['AdditiveExpressionZegond', 'C']",,,synch,synch,,synch,,,,
-SimpleExpressionPrime,,,,,,['epsilon'],,,,,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']",,,,['epsilon'],['epsilon'],,['epsilon'],,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']"
-C,,,,,,['epsilon'],,,,,,,,,,,['epsilon'],['epsilon'],,['epsilon'],,,"['Relop', 'AdditiveExpression']","['Relop', 'AdditiveExpression']"
+SimpleExpressionPrime,,,,,,"['AdditiveExpressionPrime', 'C']",,,,,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']",,,,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']",,"['AdditiveExpressionPrime', 'C']",,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']"
+C,,,,,,['epsilon'],,,,,,,,,,,['epsilon'],['epsilon'],,['epsilon'],,"['Relop', 'AdditiveExpression']",,"['Relop', 'AdditiveExpression']"
 AdditiveExpression,,,,,,synch,,,,"['Term', 'D']","['Term', 'D']","['Term', 'D']","['Term', 'D']","['Term', 'D']",,,synch,synch,,synch,,,,
-AdditiveExpressionPrime,,,,,,['epsilon'],,,,,"['TermPrime', 'D']","['TermPrime', 'D']","['TermPrime', 'D']",,,,['epsilon'],['epsilon'],,['epsilon'],,"['TermPrime', 'D']",['epsilon'],['epsilon']
-AdditiveExpressionZegond,,,,,,synch,,,,,"['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']",,,synch,synch,,synch,,,synch,synch
-D,,,,,,['epsilon'],,,,,"['Addop', 'Term', 'D']","['Addop', 'Term', 'D']",,,,,['epsilon'],['epsilon'],,['epsilon'],,,['epsilon'],['epsilon']
-Term,,,,,,synch,,,,"['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']",,,synch,synch,,synch,,,synch,synch
-TermPrime,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],"['SignedFactorPrime', 'G']",,,,['epsilon'],['epsilon'],,['epsilon'],,"['SignedFactorPrime', 'G']",['epsilon'],['epsilon']
-TermZegond,,,,,,synch,,,,,"['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']",,,synch,synch,,synch,,,synch,synch
-G,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],,,,,['epsilon'],['epsilon'],,['epsilon'],,"['*', 'SignedFactor', 'G']",['epsilon'],['epsilon']
+AdditiveExpressionPrime,,,,,,"['TermPrime', 'D']",,,,,"['TermPrime', 'D']","['TermPrime', 'D']","['TermPrime', 'D']",,,,"['TermPrime', 'D']","['TermPrime', 'D']",,"['TermPrime', 'D']",,"['TermPrime', 'D']","['TermPrime', 'D']","['TermPrime', 'D']"
+AdditiveExpressionZegond,,,,,,synch,,,,,"['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']",,,synch,synch,,synch,,synch,,synch
+D,,,,,,['epsilon'],,,,,"['Addop', 'Term', 'D']","['Addop', 'Term', 'D']",,,,,['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],,['epsilon']
+Term,,,,,,synch,,,,"['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']",,,synch,synch,,synch,,synch,,synch
+TermPrime,,,,,,"['SignedFactorPrime', 'G']",,,,,"['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']",,,,"['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']",,"['SignedFactorPrime', 'G']",,"['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']"
+TermZegond,,,,,,synch,,,,,"['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']",,,synch,synch,,synch,,synch,,synch
+G,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],,,,,['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],"['*', 'SignedFactor', 'G']",['epsilon']
 Factor,,,,,,synch,,,,"['ID', 'VarCallPrime']",synch,synch,"['(', 'Expression', ')']",['NUM'],,,synch,synch,,synch,,synch,synch,synch
-VarCallPrime,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],"['(', 'Args', ')']",,,['VarPrime'],['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],['epsilon'],['epsilon']
+VarCallPrime,,,,,,['VarPrime'],,,,,['VarPrime'],['VarPrime'],"['(', 'Args', ')']",,,['VarPrime'],['VarPrime'],['VarPrime'],,['VarPrime'],,['VarPrime'],['VarPrime'],['VarPrime']
 VarPrime,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],,,,"['[', 'Expression', ']']",['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],['epsilon'],['epsilon']
 FactorZegond,,,,,,synch,,,,,synch,synch,"['(', 'Expression', ')']",['NUM'],,,synch,synch,,synch,,synch,synch,synch
 SignedFactor,,,,,,synch,,,,['Factor'],"['+', 'Factor']","['-', 'Factor']",['Factor'],['Factor'],,,synch,synch,,synch,,synch,synch,synch
-SignedFactorPrime,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],['FactorPrime'],,,,['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],['epsilon'],['epsilon']
+SignedFactorPrime,,,,,,['FactorPrime'],,,,,['FactorPrime'],['FactorPrime'],['FactorPrime'],,,,['FactorPrime'],['FactorPrime'],,['FactorPrime'],,['FactorPrime'],['FactorPrime'],['FactorPrime']
 FactorPrime,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],"['(', 'Args', ')']",,,,['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],['epsilon'],['epsilon']
 SignedFactorZegond,,,,,,synch,,,,,"['+', 'Factor']","['-', 'Factor']",['FactorZegond'],['FactorZegond'],,,synch,synch,,synch,,synch,synch,synch
-Relop,,,,,,,,,,synch,synch,synch,synch,synch,,,,,,,,,['=='],['<']
+Relop,,,,,,,,,,synch,synch,synch,synch,synch,,,,,,,,['=='],,['<']
 Addop,,,,,,,,,,synch,['+'],['-'],synch,synch,,,,,,,,,,
 Args,,,,,,,,,,['ArgList'],['ArgList'],['ArgList'],['ArgList'],['ArgList'],,,,['epsilon'],,,,,,
 ArgList,,,,,,,,,,"['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']",,,,synch,,,,,,
