@@ -702,14 +702,16 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
             print("**")
 
         elif ( top not in parsing_table) or( token not in parsing_table[top]):
+            print("****")
             if ( token == '$' and top != 'epsilon' ) :
                 eof_error = True
                 errors.append(f"#{line_num + 1} : syntax error, Unexpected EOF")
             else : 
                 errors.append(f"#{line_num} : syntax error, illegal {token}")
             index += 1 
-            stack.insert(len(stack)-1,(top , current_node))
+            stack.insert(len(stack),(top , current_node))
         elif  top != token:
+            print("%")
             errors.append(f"#{line_num} : syntax error, illegal {token}")
             # index += 1 
             # stack.insert(0,(top , current_node))

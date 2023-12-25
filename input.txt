@@ -1,31 +1,23 @@
-/* sample 6 */
+/* sample 7 */
 
-int main(void) {
-    int grades[4];
+void main() {
+    int values[4];
     int i;
-    int sum;
-    int average;
-
-    i = 0;
-    while (i < 4) {
-        grades[i] = i * 10;
-        i = i + 1;
-    }
-
-
-    sum = 0;
     i = 0;
 
-    while (i < 4) {
-        sum = sum + grades[i];
-        i = i + 1;
+    while (i < 0) {
+        values[i] = i * 3;
+        i = i + 1
     }
 
-    average = sum / 4;
+    int total;
+    total == 0;
+    int i;
+    i = 0;
 
-    if (70 < average) {
-        return 1;
-    } else {
-        return 0;
+    while (i < 0) {
+        total = total + values[i];
     }
+
+    return total;
 }
