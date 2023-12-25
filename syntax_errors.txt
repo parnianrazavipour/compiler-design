@@ -1,1 +1,2 @@
-There is no syntax error.
+#24 : syntax error, illegal /
+#24 : syntax error, illegal NUM

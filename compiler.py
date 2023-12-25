@@ -573,7 +573,7 @@ grammar_rules =  [
 
 parsing_table = {}
 
-keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*']
+keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*', '$']
 firstSetOfNonTerminals = {key: [key] for key in keys}
 
 
@@ -667,13 +667,14 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     eof_error = False
 
     flat_token_list = [(line_num, token) for line_num, tokens in sorted(token_lists.items()) for token in tokens]
+    print(len(flat_token_list))
 
     index = 0
     while stack and index < len(flat_token_list):
 
         line_num, (token_type, token_value) = flat_token_list[index]
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
-        print('token  = ', token)
+        print('token  = ', token , "index ", index)
         print(' stack' , [x[0] for x in stack])
         
         top, current_node = stack.pop()
@@ -694,21 +695,26 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
 
         elif top == 'epsilon':
             Node('epsilon', parent=current_node)
+            print("*")
+
         elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] == 'synch':
             errors.append(f"#{line_num} : syntax error, missing {top}")
+            print("**")
 
-        elif (top not in parsing_table) or (token not in parsing_table[top]) :
-            if ( token == '$' ) :
+        elif ( top not in parsing_table) or( token not in parsing_table[top]):
+            if ( token == '$' and top != 'epsilon' ) :
                 eof_error = True
                 errors.append(f"#{line_num + 1} : syntax error, Unexpected EOF")
             else : 
                 errors.append(f"#{line_num} : syntax error, illegal {token}")
             index += 1 
-            stack.insert(0,(top , current_node))
+            stack.insert(len(stack)-1,(top , current_node))
         elif  top != token:
             errors.append(f"#{line_num} : syntax error, illegal {token}")
             # index += 1 
             # stack.insert(0,(top , current_node))
+        # else :
+        #     print("moew")
 
         
 
