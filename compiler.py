@@ -664,6 +664,7 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     root = Node('Program')
     stack = [('Program', root)]
     errors = []
+    eof_error = False
 
     flat_token_list = [(line_num, token) for line_num, tokens in sorted(token_lists.items()) for token in tokens]
 
@@ -698,20 +699,22 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
 
         elif (top not in parsing_table) or (token not in parsing_table[top]) :
             if ( token == '$' ) :
-                errors.append(f"#{line_num} : syntax error, Unexpected EOF")
+                eof_error = True
+                errors.append(f"#{line_num + 1} : syntax error, Unexpected EOF")
             else : 
                 errors.append(f"#{line_num} : syntax error, illegal {token}")
             index += 1 
             stack.insert(0,(top , current_node))
         elif  top != token:
             errors.append(f"#{line_num} : syntax error, illegal {token}")
-            index += 1 
-            stack.insert(0,(top , current_node))
+            # index += 1 
+            # stack.insert(0,(top , current_node))
 
         
 
     # if not errors and stack:
-    Node('$', parent=root)
+    if (not eof_error) :
+        Node('$', parent=root)
 
     with open('parse_tree.txt', 'w') as file:
         for pre, fill, node in RenderTree(root):

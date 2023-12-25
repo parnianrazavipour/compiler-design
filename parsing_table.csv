@@ -1,4 +1,4 @@
-,int,void,$,{,break,;,if,while,return,ID,+,-,(,NUM,},[,",",),else,],=,==,*,<
+,int,void,$,{,break,;,if,while,return,ID,+,-,(,NUM,},[,",",),else,],=,*,==,<
 Program,['DeclarationList'],['DeclarationList'],['DeclarationList'],,,,,,,,,,,,,,,,,,,,,
 DeclarationList,"['Declaration', 'DeclarationList']","['Declaration', 'DeclarationList']",['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],,,,,,,,,
 Declaration,"['DeclarationInitial', 'DeclarationPrime']","['DeclarationInitial', 'DeclarationPrime']",synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,,,,,,,,,
@@ -22,15 +22,15 @@ B,,,,,,['SimpleExpressionPrime'],,,,,['SimpleExpressionPrime'],['SimpleExpressio
 H,,,,,,"['G', 'D', 'C']",,,,,"['G', 'D', 'C']","['G', 'D', 'C']",,,,,"['G', 'D', 'C']","['G', 'D', 'C']",,"['G', 'D', 'C']","['=', 'Expression']","['G', 'D', 'C']","['G', 'D', 'C']","['G', 'D', 'C']"
 SimpleExpressionZegond,,,,,,synch,,,,,"['AdditiveExpressionZegond', 'C']","['AdditiveExpressionZegond', 'C']","['AdditiveExpressionZegond', 'C']","['AdditiveExpressionZegond', 'C']",,,synch,synch,,synch,,,,
 SimpleExpressionPrime,,,,,,"['AdditiveExpressionPrime', 'C']",,,,,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']",,,,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']",,"['AdditiveExpressionPrime', 'C']",,"['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']","['AdditiveExpressionPrime', 'C']"
-C,,,,,,['epsilon'],,,,,,,,,,,['epsilon'],['epsilon'],,['epsilon'],,"['Relop', 'AdditiveExpression']",,"['Relop', 'AdditiveExpression']"
+C,,,,,,['epsilon'],,,,,,,,,,,['epsilon'],['epsilon'],,['epsilon'],,,"['Relop', 'AdditiveExpression']","['Relop', 'AdditiveExpression']"
 AdditiveExpression,,,,,,synch,,,,"['Term', 'D']","['Term', 'D']","['Term', 'D']","['Term', 'D']","['Term', 'D']",,,synch,synch,,synch,,,,
 AdditiveExpressionPrime,,,,,,"['TermPrime', 'D']",,,,,"['TermPrime', 'D']","['TermPrime', 'D']","['TermPrime', 'D']",,,,"['TermPrime', 'D']","['TermPrime', 'D']",,"['TermPrime', 'D']",,"['TermPrime', 'D']","['TermPrime', 'D']","['TermPrime', 'D']"
-AdditiveExpressionZegond,,,,,,synch,,,,,"['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']",,,synch,synch,,synch,,synch,,synch
-D,,,,,,['epsilon'],,,,,"['Addop', 'Term', 'D']","['Addop', 'Term', 'D']",,,,,['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],,['epsilon']
-Term,,,,,,synch,,,,"['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']",,,synch,synch,,synch,,synch,,synch
+AdditiveExpressionZegond,,,,,,synch,,,,,"['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']","['TermZegond', 'D']",,,synch,synch,,synch,,,synch,synch
+D,,,,,,['epsilon'],,,,,"['Addop', 'Term', 'D']","['Addop', 'Term', 'D']",,,,,['epsilon'],['epsilon'],,['epsilon'],,,['epsilon'],['epsilon']
+Term,,,,,,synch,,,,"['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']","['SignedFactor', 'G']",,,synch,synch,,synch,,,synch,synch
 TermPrime,,,,,,"['SignedFactorPrime', 'G']",,,,,"['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']",,,,"['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']",,"['SignedFactorPrime', 'G']",,"['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']","['SignedFactorPrime', 'G']"
-TermZegond,,,,,,synch,,,,,"['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']",,,synch,synch,,synch,,synch,,synch
-G,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],,,,,['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],"['*', 'SignedFactor', 'G']",['epsilon']
+TermZegond,,,,,,synch,,,,,"['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']","['SignedFactorZegond', 'G']",,,synch,synch,,synch,,,synch,synch
+G,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],,,,,['epsilon'],['epsilon'],,['epsilon'],,"['*', 'SignedFactor', 'G']",['epsilon'],['epsilon']
 Factor,,,,,,synch,,,,"['ID', 'VarCallPrime']",synch,synch,"['(', 'Expression', ')']",['NUM'],,,synch,synch,,synch,,synch,synch,synch
 VarCallPrime,,,,,,['VarPrime'],,,,,['VarPrime'],['VarPrime'],"['(', 'Args', ')']",,,['VarPrime'],['VarPrime'],['VarPrime'],,['VarPrime'],,['VarPrime'],['VarPrime'],['VarPrime']
 VarPrime,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],,,,"['[', 'Expression', ']']",['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],['epsilon'],['epsilon']
@@ -39,7 +39,7 @@ SignedFactor,,,,,,synch,,,,['Factor'],"['+', 'Factor']","['-', 'Factor']",['Fact
 SignedFactorPrime,,,,,,['FactorPrime'],,,,,['FactorPrime'],['FactorPrime'],['FactorPrime'],,,,['FactorPrime'],['FactorPrime'],,['FactorPrime'],,['FactorPrime'],['FactorPrime'],['FactorPrime']
 FactorPrime,,,,,,['epsilon'],,,,,['epsilon'],['epsilon'],"['(', 'Args', ')']",,,,['epsilon'],['epsilon'],,['epsilon'],,['epsilon'],['epsilon'],['epsilon']
 SignedFactorZegond,,,,,,synch,,,,,"['+', 'Factor']","['-', 'Factor']",['FactorZegond'],['FactorZegond'],,,synch,synch,,synch,,synch,synch,synch
-Relop,,,,,,,,,,synch,synch,synch,synch,synch,,,,,,,,['=='],,['<']
+Relop,,,,,,,,,,synch,synch,synch,synch,synch,,,,,,,,,['=='],['<']
 Addop,,,,,,,,,,synch,['+'],['-'],synch,synch,,,,,,,,,,
 Args,,,,,,,,,,['ArgList'],['ArgList'],['ArgList'],['ArgList'],['ArgList'],,,,['epsilon'],,,,,,
 ArgList,,,,,,,,,,"['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']","['Expression', 'ArgListPrime']",,,,synch,,,,,,
