@@ -1,4 +1,4 @@
-,int,void,$,{,break,;,if,while,return,ID,+,-,(,NUM,},[,",",),else,],=,*,<,==
+,void,int,$,{,break,;,if,while,return,ID,+,-,(,NUM,},[,",",),else,],=,*,<,==
 Program,['DeclarationList'],['DeclarationList'],['DeclarationList'],,,,,,,,,,,,,,,,,,,,,
 DeclarationList,"['Declaration', 'DeclarationList']","['Declaration', 'DeclarationList']",['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],['epsilon'],,,,,,,,,
 Declaration,"['DeclarationInitial', 'DeclarationPrime']","['DeclarationInitial', 'DeclarationPrime']",synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,,,,,,,,,
@@ -6,8 +6,8 @@ DeclarationInitial,"['TypeSpecifier', 'ID']","['TypeSpecifier', 'ID']",,,,synch,
 DeclarationPrime,synch,synch,synch,synch,synch,['VarDeclarationPrime'],synch,synch,synch,synch,synch,synch,['FunDeclarationPrime'],synch,synch,['VarDeclarationPrime'],,,,,,,,
 VarDeclarationPrime,synch,synch,synch,synch,synch,[';'],synch,synch,synch,synch,synch,synch,synch,synch,synch,"['[', 'NUM', ']', ';']",,,,,,,,
 FunDeclarationPrime,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,"['(', 'Params', ')', 'CompoundStmt']",synch,synch,,,,,,,,,
-TypeSpecifier,['int'],['void'],,,,,,,,synch,,,,,,,,,,,,,,
-Params,"['int', 'ID', 'ParamPrime', 'ParamList']",['void'],,,,,,,,,,,,,,,,synch,,,,,,
+TypeSpecifier,['void'],['int'],,,,,,,,synch,,,,,,,,,,,,,,
+Params,['void'],"['int', 'ID', 'ParamPrime', 'ParamList']",,,,,,,,,,,,,,,,synch,,,,,,
 Param,"['DeclarationInitial', 'ParamPrime']","['DeclarationInitial', 'ParamPrime']",,,,,,,,,,,,,,,synch,synch,,,,,,
 CompoundStmt,synch,synch,synch,"['{', 'DeclarationList', 'StatementList', '}']",synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,synch,,,,synch,,,,,
 StatementList,,,,"['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']","['Statement', 'StatementList']",['epsilon'],,,,,,,,,

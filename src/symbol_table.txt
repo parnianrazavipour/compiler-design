@@ -1,0 +1,9 @@
+1.	if
+2.	while
+3.	return
+4.	main
+5.	else
+6.	x
+7.	break
+8.	void
+9.	int
