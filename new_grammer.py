@@ -1,7 +1,74 @@
-def SAVE():
-    
+ss = []
+data_block_base = 100
+data_block_memory = []
+symbol_table = []
+Program_block = []
+ENTRY_LEN = 4
+scope_stack = [ ]
+
+class Data :
+    def __init__(self, lexeme, type , memory_address , size=4 , array_size = 1 ) -> None:
+        self.lexem = lexeme
+        self.type = type
+        self.memory_address = memory_address
+        self.size = size
+        if(type == 'arr_int' ) :
+            self.array_size = array_size
+        self.value = 0
     
 
+
+def error_handle(action, datas) :
+    if action == 'DEC_VARIABLE' :
+        name,type = datas[0], datas[1]
+        if (type == 'void') :
+            print("error !")
+        else : return True
+
+
+
+def SAVE(token):
+    ss.push(token)
+
+def DEC_VARIABLE() :
+    name = ss.pop()
+    type = ss.pop()
+    if error_handle('DEC_VARIABLE' ,[name, type]) :
+        data_memory_index = len(data_block_memory) + data_block_base + ENTRY_LEN 
+        data = Data(lexeme = name ,type = type , memory_address = data_memory_index)
+        # added to memory
+        data_block_memory.append(data)
+        # added to symbol table 
+        symbol_table.append(data)
+        
+            
+def DEC_ARRAY( ) :
+    size = ss.pop()
+    array_name = ss.pop()
+    data_memory_index = len(data_block_memory) + data_block_base  + ENTRY_LEN
+    array_start_index = data_memory_index
+    for i in range(size) :
+        data_memory_index +=4
+        data = Data(lexeme=array_name, type='arr_int_val',memory_address=data_memory_index,  array_size = size )
+        data_block_memory.append( data)
+
+    data = Data(lexeme=array_name , type='arr_int', memory_address=array_start_index , array_size=size)
+    symbol_table.append(data)
+
+  
+
+def DEC_FUNCTION( ) :
+    func_name = ss.pop()
+    return_type = ss.pop()
+    scope_stack.append(func_name)
+    if (func_name == 'main') :
+        current_pb_index = len(Program_block)
+        Program_block.append('(JP,'+str(current_pb_index)+',,)')
+    data = Data(lexeme=func_name ,)
+      
+
+
+    
 
 
 
@@ -14,7 +81,7 @@ grammar_rules =  [
   { left: 'DeclarationList', right: ['Declaration', 'DeclarationList'] },
   { left: 'DeclarationList', right: ['epsilon'] },
   { left: 'Declaration', right: ['DeclarationInitial', 'DeclarationPrime'] },
-  { left: 'DeclarationInitial', right: ['@SAVE','TypeSpecifier', '@SAVE_ID', 'ID',''] },
+  { left: 'DeclarationInitial', right: ['@SAVE','TypeSpecifier', '@SAVE', 'ID',''] },
   { left: 'DeclarationPrime', right: ['FunDeclarationPrime'] },
   { left: 'DeclarationPrime', right: ['VarDeclarationPrime'] },
   { left: 'VarDeclarationPrime', right: [';' , '@DEC_VARIABLE'] },
@@ -77,7 +144,6 @@ grammar_rules =  [
   { left: 'VarCallPrime', right: ['VarPrime'] },
   { left: 'VarPrime', right: ['[', 'Expression', ']'] },
   { left: 'VarPrime', right: ['epsilon'] },
-
   { left: 'FactorZegond', right: ['(', 'Expression', ')'] },
   { left: 'FactorZegond', right: ['@SAVE_CONST','NUM'] },
   { left: 'Args', right: ['ArgList'] },
