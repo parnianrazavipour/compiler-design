@@ -1,10 +1,6 @@
-import string
-from collections import defaultdict
-import json
-import json
-from collections import defaultdict
+# import string
 from anytree import Node, RenderTree
-
+from first_follow import data
 
 
 # class ParseTreeNode:
@@ -28,9 +24,15 @@ excluded_symbols = [char for char in symbol if char not in ['/', '*']]
 excluded_symbols_1= [char for char in symbol if char not in ['=']]
 excluded_symbols_2= [char for char in symbol if char not in ['*']]
 excluded_symbols_3= [char for char in symbol if char not in ['/']]
-all_chars = set(string.printable)
-ees= [char for char in all_chars if char !='*']
+# all_chars = set(string.printable)
+# ees= [char for char in all_chars if char !='*']
+d = '0123456789'
+ascii_letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+punctuation = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+whitespace = ' \t\n\r\x0b\x0c'
 
+all_chars = set(d + ascii_letters + punctuation + whitespace)
+ees = [char for char in all_chars if char != '*']
 
 type_dict = { 'Digit' : digits , '^Digit': symbol + white_space + ['\x00'] ,  'SEE' :see , 'Alpha' : all_alphabets , 
          'alpha' : lower_case_alphabet , '^alpha' : upper_case_alphabet + digits + symbol + white_space + ['\x00'] ,
@@ -254,8 +256,8 @@ def add_token_states(dfa):
 
 key_table = []
 id_table = []
-tokens_table= defaultdict(list)
-lexical_errors_table = defaultdict(list)
+tokens_table= {}
+lexical_errors_table = {}
 point1 = 0
 point2 = 0 
 line_number = 1
@@ -285,7 +287,8 @@ def get_next_token(input_string ,current_ch  , dfa , temp) :
                     if(len(input_string[point1:point2+1]) >= 7) :
                         first_of_comment = input_string[point1:point1+7]
                     else : first_of_comment = input_string[point1:point2+1]
-
+                    if line_comment_starts not in lexical_errors_table:
+                        lexical_errors_table[line_comment_starts] = []
                     lexical_errors_table[line_comment_starts].append(f"({first_of_comment}..., Unclosed comment)")
                     return 'error'
             
@@ -348,6 +351,8 @@ def Scanner ( input_string , dfa ) :
 
             next_token = get_next_token(input_string ,current_ch  , dfa , temp)
             if ( next_token != 'error' and next_token!= 'white_space_comment' and next_token.startswith("(") ) :
+                if line_number not in tokens_table:
+                  tokens_table[line_number] = []
                 tokens_table[line_number].append(next_token)
                 continue
 
@@ -359,6 +364,8 @@ def Scanner ( input_string , dfa ) :
         else :
 
             if (dfa.states_type[dfa.current_state]== 'SYMBOL'  and current_ch == "/" and point2 >=1 and  input_string[point2-1] =='*') :
+                    if line_number not in lexical_errors_table:
+                        lexical_errors_table[line_number] = []
                     lexical_errors_table[line_number].append(f"(*/, Unmatched comment)")
                     dfa.current_state = 0
                     point2+=1
@@ -366,6 +373,8 @@ def Scanner ( input_string , dfa ) :
                     continue   
             
             if(dfa.current_state == 0 or dfa.states_type[dfa.current_state] in ['ID','KEYWORD' , 'SYMBOL']):
+                if line_number not in lexical_errors_table:
+                        lexical_errors_table[line_number] = []
                 lexical_errors_table[line_number].append(f"({input_string[point1:point2+1]}, Invalid input)")
                 dfa.current_state = 0
                 point2+=1
@@ -373,6 +382,8 @@ def Scanner ( input_string , dfa ) :
                 continue
 
             if( dfa.states_type[dfa.current_state] == 'WHITESPACE'):
+                if line_number not in lexical_errors_table:
+                        lexical_errors_table[line_number] = []
                 lexical_errors_table[line_number].append(f"({input_string[point2]}, Invalid input)")
                 dfa.current_state = 0
                 point2+=1
@@ -380,6 +391,8 @@ def Scanner ( input_string , dfa ) :
                 continue
 
             if(dfa.states_type[dfa.current_state] == 'NUM') :
+                if line_number not in lexical_errors_table:
+                        lexical_errors_table[line_number] = []
                 lexical_errors_table[line_number].append(f"({input_string[point1:point2+1]}, Invalid number)")
                 dfa.current_state = 0
                 point2+=1
@@ -387,12 +400,16 @@ def Scanner ( input_string , dfa ) :
                 continue
 
             if( dfa.states_type[dfa.current_state] == 'COMMENT' and point2>=1 and input_string[point2-2] == '*'):
+                    if line_number not in lexical_errors_table:
+                        lexical_errors_table[line_number] = []
                     lexical_errors_table[line_number].append(f"(*/, Unmatched comment)")
                     dfa.current_state = 0
                     point1=point2
                     continue   
             
             if (dfa.states_type[dfa.current_state] == 'COMMENT') :
+                if line_number not in lexical_errors_table:
+                        lexical_errors_table[line_number] = []
                 lexical_errors_table[line_number].append(f"(/, Invalid input)")
                 dfa.current_state = 0
                 point2+=1
@@ -455,9 +472,8 @@ write_symbol_table()
 write_tokens()
 write_lexical_errors()
 
-with open('first-follow.json', 'r') as file:
-    data = json.load(file)
-
+# with open('first-follow.json', 'r') as file:
+#     data = json.load(file)
 
 first_sets = data['firstSets']
 follow_sets = data['followSets']
@@ -638,7 +654,7 @@ add_synch_to_parsing_table(parsing_table, follow_sets)
 # df.to_csv(output_path, index=True)
 
 
-token_lists = defaultdict(list)
+token_lists = {}
 last_number = 0
 for line_number in sorted(tokens_table):
     line_tokens = []
@@ -647,6 +663,8 @@ for line_number in sorted(tokens_table):
         token_value = token_value.strip()
         line_tokens.append((token_type , token_value))
     last_number = line_number
+    if line_number not in token_lists :
+        token_lists[line_number] = []
     token_lists[line_number] = line_tokens
 
 token_lists[last_number].append(('$','$'))
@@ -755,10 +773,8 @@ parse_tree, parse_errors = parse(token_lists, parsing_table, first_sets, follow_
 # Save the errors to a file
 with open('syntax_errors.txt', 'w') as error_file:
     for error in parse_errors:
-        if error== parse_errors[len(parse_errors)-1] :
+
             error_file.write(error + '\n')
-        else :
-            error_file.write(error)
 
     if len(parse_errors) == 0:
         error_file.write('There is no syntax error.')

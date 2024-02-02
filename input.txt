@@ -1,10 +1,14 @@
-/* sample 5 */
+/* sample 13 */
 
-int sum(int a, int b) {
-    return a + b;
-}
+void barnaame(int compiler) {
+    void x[10];
+    int y;
+    int g;
+    x = 5;
+    y = 10;
+    
+    if (x < y) {
+        x = x + 1;
 
-void main(void) {
-    int result;
-    result = sum(3, 4;
+    return 0;
 }
