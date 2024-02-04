@@ -1,14 +1,28 @@
 /* sample 13 */
 
+int ann;
+
+
+void h(int b){
+    b = 1;
+    return;
+}
+
+ann = h(2);
+
 void barnaame(int compiler) {
     void x[10];
     int y;
     int g;
     x = 5;
     y = 10;
-    
-    if (x < y) {
-        x = x + 1;
-
+    if( x == 2 ) {
+        int g;
+        g = 0 ;
+        break;
+    } 
+    else {
+        int k;
+    }
     return 0;
 }

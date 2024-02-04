@@ -1,2 +1,1 @@
-#14 : syntax error, missing else
-#15 : syntax error, Unexpected EOF
+There is no syntax error.
