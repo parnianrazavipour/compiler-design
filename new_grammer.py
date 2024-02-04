@@ -1,26 +1,27 @@
 ss = []
-data_block_base = 100
+data_block_base = 1
 data_block_memory = []
-symbol_table = []
+symbol_table = {}
 Program_block = []
-data_size = 4
 scope_stack = [ ]
-global_sb = [ ]
+global_sb = {}
 is_while = True
 loop_stack = []
 current_sb = []
-temp_base = 500
-temp_current_index = -data_size
-top_sp = 1000
-fsp = 5000
+temp_base = 1000
+temp_current_index = -4
+data_size = 4
+top_sp = 500
+fsp = 4000
 we_have_aregs = False
 print_stack = []
 args_stack = []
 runtime_stack = []
-start_of_new_statement = []
+start_of_new_statement = 0
 
 def get_temp_index():
-        temp_current_index+=data_size
+        global temp_current_index
+        temp_current_index = 4 + temp_current_index
         return temp_current_index + temp_base
 
 
@@ -66,7 +67,24 @@ def current_scope() :
     return scope_stack[-1]
     
 
+def get_data_block_memory(address) :
+     if ('@' in address) :
+          address = ( int(address[1:])  - data_block_base) // 4 
+          print(address)
+          print(len(data_block_memory))
+          address =  data_block_memory[address].memory_address
+          address = ( address - data_block_base ) // 4
+          return data_block_memory[address]
+     elif ('#' not  in address) :
+          address =  ( int(address[1:])  - data_block_base) // 4 
+          return data_block_memory[address]
+          
+              
+     
 
+
+          
+     
     
 def search_data_in_sb(sb,name) :
     for data in sb[::-1] :
@@ -100,14 +118,16 @@ def error_handle(action, datas) :
             return False
         else : return 
     if action == 'PID' :
-        current_scope = current_scope()
-        if len(current_scope) == 0 :
+        name = datas
+        current_s = current_scope()
+        if len(current_s) == 0 :
             data_in_gloabl = check_data_is_global(name)
             if data_in_gloabl is None :
                 print('not defined error!')
                 return False
             else : return True
         else :
+            current_sb = symbol_table[current_scope()]
             data_in_current_symbol_table = search_data_in_sb(current_sb , name)
             if data_in_current_symbol_table is None :
                 print('not defined error!')
@@ -115,21 +135,77 @@ def error_handle(action, datas) :
             else : return True
 
     if action == 'ADD_SUB':
-        a , b = int(datas[0]) , int(datas[1])
-        if 'int' in data_block_memory[a].type and 'int' in  data_block_memory[b].type :
-            return True
-        else : 
-            print('error')
-            return False
-    if action == 'MULT':
-        a , b = int(datas[0]) , int(datas[1])
-        if 'int' in data_block_memory[a].type and 'int' in  data_block_memory[b].type :
-            return True
+        a , b = datas[0] , datas[1]
+        a_is_int , b_is_int = False , False
+
+        if '#' in a :
+             a_is_int = True
+        elif ('int' in get_data_block_memory(a).type  ) :
+             a_is_int = True
+        else :
+             a_is_int = False
+
+        if '#' in b :
+             b_is_int = True
+        elif ('int' in get_data_block_memory(b).type  ) :
+             b_is_int = True
+        else :
+             b_is_int = False
+        
+        if a_is_int and b_is_int :
+             return True
         else : 
             print('error')
             return False
         
 
+    if action == 'MULT':
+        a , b = datas[0] , datas[1]
+        a_is_int , b_is_int = False , False
+
+        if '#' in a :
+             a_is_int = True
+        elif ('int' in get_data_block_memory(a).type  ) :
+             a_is_int = True
+        else :
+             a_is_int = False
+
+        if '#' in b :
+             b_is_int = True
+        elif ('int' in get_data_block_memory(b).type  ) :
+             b_is_int = True
+        else :
+             b_is_int = False
+        
+        if a_is_int and b_is_int :
+             return True
+        else : 
+            print('error')
+            return False
+        
+    if action == 'COMPARE' :
+        a , b = datas[0] , datas[1]
+        a_is_int , b_is_int = False , False
+
+        if '#' in a :
+             a_is_int = True
+        elif ('int' in get_data_block_memory(a).type  ) :
+             a_is_int = True
+        else :
+             a_is_int = False
+
+        if '#' in b :
+             b_is_int = True
+        elif ('int' in get_data_block_memory(b).type  ) :
+             b_is_int = True
+        else :
+             b_is_int = False
+        
+        if a_is_int and b_is_int :
+             return True
+        else : 
+            print('error')
+            return False
 
 
 
@@ -144,15 +220,15 @@ def get_ofs(data1, data2 ) :
 
 def  PID(token):
         adr = 0 
-        name = token[1]
+        name = token
         offset = 0
         address = 0
         is_global_or_main = False
         if name != 'output':
             if error_handle('PID', name) :
                 if (len(scope_stack) > 0 ) :
-                    current_scope = current_scope()
-                    current_symbol_table = symbol_table[current_scope]
+                    cs = current_scope()
+                    current_symbol_table = symbol_table[cs]
                     data = search_data_in_sb(current_symbol_table , name )
                     data1 = current_symbol_table[0]
                     offset = get_ofs(data , data1)
@@ -164,12 +240,12 @@ def  PID(token):
                 
                 if is_global_or_main :
                     address = global_sb[name].memory_address
-                    ss.push(address)
+                    ss.append(address)
 
                 if not is_global_or_main  :
                     address = get_temp_index()
                     Program_block.append(('ADD', top_sp, f'#{offset}', address))
-                    ss.push(f'@{address}')
+                    ss.append(f'@{address}')
         
         else:
             ss.push('OUTPUT')
@@ -209,7 +285,7 @@ def SAVE(token):
     elif token == '==':
             token = 'EQ'
 
-    ss.push(token)
+    ss.append(token)
 
 
 
@@ -224,6 +300,7 @@ def DEC_VARIABLE() :
         data_block_memory.append(data)
         # added to symbol table 
         symbol_table[current_scope()].append(data)
+
 
         
             
@@ -240,6 +317,8 @@ def DEC_ARRAY( ) :
     data = Data(lexeme=array_name , type='arr', memory_address=array_start_index , array_size=size)
     symbol_table[current_scope()].append(data)
 
+
+
   
 
 def DEC_FUNCTION( ) :
@@ -249,7 +328,7 @@ def DEC_FUNCTION( ) :
     scope_stack.append(func_name)
     if (func_name == 'main') :
         current_pb_index = len(Program_block)
-        Program_block.append(  ('JP' ,+str(current_pb_index) ,None , None ) ) 
+        Program_block.append(  ('JP' , str(current_pb_index) ,None , None ) ) 
 
     data = Data(lexeme=func_name , type = 'func_'+ return_type, memory_address= get_data_memory_current_index() + data_size )
     # ?
@@ -375,7 +454,7 @@ def RETURN_VALUE():
         Program_block.append(('SUB', fsp, f'#{data_size}', fsp))
         Program_block.append(('ASSIGN', f'@{fsp}', top_sp, None))
 
-        Program_block.append(('ASSIGN', f'@{top_sp}', temp, None))
+        Program_block.append(('ASSIGN', f'@{temp}', temp, None))
         Program_block.append(('JP', f'@{temp}', None, None))
       
 
@@ -388,20 +467,18 @@ def RETURN_VOID():
         Program_block.append(('SUB', fsp, f'#{data_size}', fsp))
         Program_block.append(('ASSIGN', f'@{fsp}', top_sp, None))
 
-        Program_block.append(('ASSIGN', f'@{top_sp}', temp, None))
+        Program_block.append(('ASSIGN', f'@{temp}', temp, None))
         Program_block.append(('JP', f'@{temp}', None, None))
 
 
 
-
-
 def ASSIGN() :
+    
     a = ss.pop()
+    print('a' , a)
+
     b = ss.pop()
     Program_block.append( ('ASSIGN', str(a), str(b) ))
-
-
-
 
 
 def att_array(b ,size):
@@ -449,10 +526,11 @@ def ADD_SUB( ) :
 
 
 def MULT ( ) :
+    print(ss)
     a = ss.pop()
     b = ss.pop()
     t =  get_temp_index()
-    if error_handle('MULT' , a , b) :
+    if error_handle('MULT' , [a , b]) :
         Program_block.append( ('MULT' , a , b , t ))
     ss.append(t)
 
@@ -464,7 +542,8 @@ def SAVE_RELOP_RESULT():
         compare  = ss.pop()
         b = ss.pop()
         t = get_temp_index()
-        if error_handle():
+
+        if error_handle('COMPARE' , [a , b]):
             Program_block.append( (compare , a , b , t ))
         ss.append(t)
 
@@ -472,7 +551,7 @@ def SAVE_RELOP_RESULT():
 
 
 def SAVE_CONST(token):
-        ss.push('#' + token[1])
+        ss.append('#' + token)
 
 
 
@@ -619,7 +698,6 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
 
 
 
-
 def CALL_FUNC( func , size, arguments):
         func_name = func.lexeme
         current_sb =  symbol_table[current_scope()]
@@ -642,6 +720,9 @@ def CALL_FUNC( func , size, arguments):
 
         ss.push(return_value )
 
+
+def S():
+    start_of_new_statement = len(Program_block)
 
 
 
@@ -683,6 +764,15 @@ def CHECK_ARGS():
 
 
 
+def CHECK_ARGS_S() :
+      CHECK_ARGS()
+      S()
+     
+
+
+
+
+
     
 
 left = 'left'
@@ -696,7 +786,7 @@ grammar_rules =  [
   { left: 'Declaration', right: ['DeclarationInitial', 'DeclarationPrime'] },
   { left: 'DeclarationInitial', right: ['@SAVE','TypeSpecifier', '@SAVE', 'ID'] },
   { left: 'DeclarationPrime', right: ['FunDeclarationPrime'] },
-  { left: 'DeclarationPrime', right: ['VarDeclarationPrime'] },
+  { left: 'DeclarationPrime', right: ['VarDeclarationPrime','@S'] },
   { left: 'VarDeclarationPrime', right: [';' , '@DEC_VARIABLE'] },
   { left: 'VarDeclarationPrime', right: ['[', '@SAVE','NUM', ']',';' ,'@DEC_ARRAY'] },
   { left: 'FunDeclarationPrime', right: ['@DEC_FUNCTION','(', 'Params', ')','@SAVE_ARGS', 'CompoundStmt' , '@END_FUNCTION'] },
@@ -709,10 +799,10 @@ grammar_rules =  [
   { left: 'Param', right: ['DeclarationInitial', 'ParamPrime'] },
   { left: 'ParamPrime', right: ['[', ']', '@DEC_ARRAY_POINTER'] },
   { left: 'ParamPrime', right: ['epsilon' , '@DEC_VARIABLE'] },
-  { left: 'CompoundStmt', right: ['{', 'DeclarationList', 'StatementList', '}'] },
+  { left: 'CompoundStmt', right: ['{', '@S','DeclarationList', 'StatementList', '}' , '@S'] },
   { left: 'StatementList', right: ['Statement', 'StatementList'] },
   { left: 'StatementList', right: ['epsilon'] },
-  { left: 'Statement', right: ['ExpressionStmt'] },
+  { left: 'Statement', right: ['ExpressionStmt' ,'@S' ] },
   { left: 'Statement', right: ['CompoundStmt'] },
   { left: 'Statement', right: ['SelectionStmt'] },
   { left: 'Statement', right: ['IterationStmt'] },
@@ -722,11 +812,11 @@ grammar_rules =  [
   { left: 'ExpressionStmt', right: [';'] },
   { left: 'SelectionStmt', right: ['if', '(', 'Expression', ')' , '@SAVE_IF' , 'Statement', 'else','@JPF_SAVE_IF', 'Statement' ,'@JP_IF'] },
   { left: 'IterationStmt', right: ['while','@LABEL', '(', 'Expression', ')','@SAVE_WHILE', 'Statement', '@WHILE'] },
-  { left: 'ReturnStmt', right: ['return', 'ReturnStmtPrime'] },
+  { left: 'ReturnStmt', right: ['return', 'ReturnStmtPrime' , '@S'] },
   { left: 'ReturnStmtPrime', right: [ '@RETURN_VOID', ';'] },
   { left: 'ReturnStmtPrime', right: ['Expression', '@RETURN_VALUE', ';'] },
   { left: 'Expression', right: ['SimpleExpressionZegond'] },
-  { left: 'Expression', right: ['@PID' ,'ID', 'B' , '#CHECK_OUTPUT'] },
+  { left: 'Expression', right: ['@PID' ,'ID', 'B' , '@CHECK_OUTPUT'] },
   { left: 'B', right: ['=', 'Expression' , '@ASSIGN'] },
   { left: 'B', right: ['[', 'Expression', ']', '@ARR_ADDR' ,'H'] },
   { left: 'B', right: ['SimpleExpressionPrime'] },
@@ -753,7 +843,7 @@ grammar_rules =  [
   { left: 'Factor', right: ['(', 'Expression', ')'] },
   { left: 'Factor', right: ['@PID','ID', 'VarCallPrime'] },
   { left: 'Factor', right: ['@SAVE_CONST','NUM'] },
-  { left: 'VarCallPrime', right: ['(', '@ARGS' , 'Args', ')','@CHECK_ARGS'] },
+  { left: 'VarCallPrime', right: ['(', '@ARGS' , 'Args', ')','@CHECK_ARGS_S' ] },
   { left: 'VarCallPrime', right: ['VarPrime'] },
   { left: 'VarPrime', right: ['[', 'Expression', ']'] },
   { left: 'VarPrime', right: ['epsilon'] },

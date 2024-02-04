@@ -1,7 +1,8 @@
 # import string
 from anytree import Node, RenderTree
 from first_follow import data
-
+import new_grammer
+from new_grammer import grammar_rules
 
 # class ParseTreeNode:
 #     def __init__(self, symbol):
@@ -492,8 +493,6 @@ for key , val in follow_sets.items():
             val[i] = '$'
         
 
-
-
 left = 'left'
 right = 'right'
 null = None
@@ -585,11 +584,277 @@ grammar_rules =  [
   { left: 'SignedFactorZegond', right: ['FactorZegond'] }
 ]
 
+new_grammar_rules = new_grammer.grammar_rules  
+mapping = {}
+for itr in range(len(grammar_rules)):
+    mapping[grammar_rules[itr]['left']+','+' '.join(grammar_rules[itr][right])] = new_grammar_rules[itr][right]
+
 
 parsing_table = {}
 
 keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*', '$']
+
+symbol_actions = ['@SAVE','@DEC_VARIABLE','@DEC_ARRAY', '@DEC_FUNCTION', '@SAVE_ARGS','@END_FUNCTION','@PID','@DEC_ARRAY_POINTER','@DEC_VARIABLE', '@BREAK', 
+'@SAVE_IF', '@JPF_SAVE_IF', '@JP_IF','@LABEL', '@SAVE_WHILE', '@WHILE','@RETURN_VOID','@RETURN_VALUE', '@ASSIGN', '@ARR_ADDR', '@SAVE_RELOP_RESULT','@ADD_SUB',
+'@MULT', '@SAVE_CONST', '@CHECK_ARGS','@ASSIGN_ARG', '@NEG']
+
+before_symbols = [ '@SAVE' , '@DEC_FUNCTION' , '@PID' ,'@RETURN_VOID' , '@SAVE_CONST', '@ASSIGN_ARG']
+
 firstSetOfNonTerminals = {key: [key] for key in keys}
+
+
+
+
+
+def code_generator(symbol_action, current_token):
+
+
+
+    if symbol_action == 'CHECK_ARGS_S' :
+    #    print('ret CHECK_ARGS_S')
+       return new_grammer.CHECK_ARGS_S()
+    
+    elif symbol_action == '@S':
+        #  print('ret@S')
+         return new_grammer.S()
+
+    elif symbol_action == '@SAVE':
+        # print('ret@SAVE')
+        return new_grammer.SAVE(current_token)
+
+    elif symbol_action == '@DEC_VARIABLE':
+        # print('ret@DEC_VARIABLE')
+        return new_grammer.DEC_VARIABLE()
+
+    elif symbol_action == '@DEC_ARRAY':
+        # print('ret@DEC_ARRAY')
+        return new_grammer.DEC_ARRAY()
+
+    elif symbol_action == '@DEC_FUNCTION':
+        return new_grammer.DEC_FUNCTION()
+        # print('ret@DEC_FUNCTION')
+
+    elif symbol_action == '@SAVE_ARGS':
+        return new_grammer.SAVE_ARGS()
+        # print('ret@SAVE_ARGS')
+
+    elif symbol_action == '@END_FUNCTION':
+        return new_grammer.END_FUNCTION()
+        # print('ret@END_FUNCTION')
+
+    elif symbol_action == '@PID':
+        return new_grammer.PID(current_token)
+        # print('ret@PID')
+
+    elif symbol_action == '@DEC_ARRAY_POINTER':
+        return new_grammer.DEC_ARRAY_POINTER()
+        # print('ret@DEC_ARRAY_POINTER')
+
+    elif symbol_action == '@DEC_VARIABLE':
+        return new_grammer.DEC_VARIABLE()
+        # print('ret@DEC_VARIABLE')
+
+    elif symbol_action == '@BREAK':
+        return new_grammer.BREAK()
+        # print('ret@BREAK')
+
+    elif symbol_action == '@SAVE_IF':
+        return new_grammer.SAVE_IF()
+        # print('ret@SAVE_IF')
+
+    elif symbol_action == '@JPF_SAVE_IF':
+        return new_grammer.JPF_SAVE_IF()
+        # print('ret@JPF_SAVE_IF')
+
+    elif symbol_action == '@JP_IF':
+        return new_grammer.JP_IF()
+        # print('ret@JP_IF')
+
+    elif symbol_action == '@LABEL':
+        return new_grammer.LABEL()
+        # print('ret@LABEL')
+
+    elif symbol_action == '@SAVE_WHILE':
+        return new_grammer.SAVE_WHILE()
+        # print('ret@SAVE_WHILE')
+
+    elif symbol_action == '@WHILE':
+        return new_grammer.WHILE
+        # print('ret@WHILE')
+
+    elif symbol_action == '@RETURN_VOID':
+        return new_grammer.RETURN_VOID()
+        # print('ret@RETURN_VOID')
+
+    elif symbol_action == '@RETURN_VALUE':
+        return new_grammer.RETURN_VALUE(current_token)
+        # print('ret@RETURN_VALUE')
+
+    elif symbol_action == '@ASSIGN':
+        return new_grammer.ASSIGN()
+        # print('ret@ASSIGN')
+
+    elif symbol_action == '@ARR_ADDR':
+        return new_grammer.ARR_ADDR()
+        # print('ret@ARR_ADDR')
+
+    elif symbol_action == '@SAVE_RELOP_RESULT':
+        return new_grammer.SAVE_RELOP_RESULT()
+        # print('ret@SAVE_RELOP_RESULT')
+
+    elif symbol_action == '@ADD_SUB':
+        new_grammer.ADD_SUB()
+        # print('ret@ADD_SUB')
+
+    elif symbol_action == '@MULT':
+        return new_grammer.MULT()
+        # print('ret@MULT')
+
+    elif symbol_action == '@SAVE_CONST':
+        return new_grammer.SAVE_CONST(current_token)
+        # print('ret@SAVE_CONST')
+
+    elif symbol_action == '@CHECK_ARGS' :
+        # return new_grammer.CHECK_ARGS()
+        print('ret@CHECK_ARGS')
+
+    elif symbol_action == '@ASSIGN_ARG':
+        return new_grammer.ASSIGN_ARG()
+        # print('ret@ASSIGN_ARG')
+
+    elif symbol_action == '@NEG':
+        return new_grammer.NEG()
+        # print('ret@NEG')
+
+    else:
+        return
+
+
+
+
+# def code_generator(symbol_action, current_token):
+
+
+
+#     if symbol_action == 'CHECK_ARGS_S' :
+#        print('ret CHECK_ARGS_S')
+#     #    return new_grammer.CHECK_ARGS_S()
+    
+#     elif symbol_action == '@S':
+#          print('ret@S')
+#         #  return new_grammer.S()
+
+#     elif symbol_action == '@SAVE':
+#         print('ret@SAVE')
+#         # return new_grammer.SAVE(current_token)
+
+#     elif symbol_action == '@DEC_VARIABLE':
+#         print('ret@DEC_VARIABLE')
+#         # return new_grammer.DEC_VARIABLE()
+
+#     elif symbol_action == '@DEC_ARRAY':
+#         print('ret@DEC_ARRAY')
+#         # return new_grammer.DEC_ARRAY()
+
+#     elif symbol_action == '@DEC_FUNCTION':
+#         # return new_grammer.DEC_FUNCTION()
+#         print('ret@DEC_FUNCTION')
+
+#     elif symbol_action == '@SAVE_ARGS':
+#         # return new_grammer.SAVE_ARGS()
+#         print('ret@SAVE_ARGS')
+
+#     elif symbol_action == '@END_FUNCTION':
+#         # return new_grammer.END_FUNCTION(current_token)
+#         print('ret@END_FUNCTION')
+
+#     elif symbol_action == '@PID':
+#         # return new_grammer.PID(current_token)
+#         print('ret@PID')
+
+#     elif symbol_action == '@DEC_ARRAY_POINTER':
+#         # return new_grammer.DEC_ARRAY_POINTER()
+#         print('ret@DEC_ARRAY_POINTER')
+
+#     elif symbol_action == '@DEC_VARIABLE':
+#         # return new_grammer.DEC_VARIABLE()
+#         print('ret@DEC_VARIABLE')
+
+#     elif symbol_action == '@BREAK':
+#         # return new_grammer.BREAK()
+#         print('ret@BREAK')
+
+#     elif symbol_action == '@SAVE_IF':
+#         # return new_grammer.SAVE_IF()
+#         print('ret@SAVE_IF')
+
+#     elif symbol_action == '@JPF_SAVE_IF':
+#         # return new_grammer.JPF_SAVE_IF()
+#         print('ret@JPF_SAVE_IF')
+
+#     elif symbol_action == '@JP_IF':
+#         # return new_grammer.JP_IF()
+#         print('ret@JP_IF')
+
+#     elif symbol_action == '@LABEL':
+#         # return new_grammer.LABEL()
+#         print('ret@LABEL')
+
+#     elif symbol_action == '@SAVE_WHILE':
+#         # return new_grammer.SAVE_WHILE()
+#         print('ret@SAVE_WHILE')
+
+#     elif symbol_action == '@WHILE':
+#         # return new_grammer.WHILE
+#         print('ret@WHILE')
+
+#     elif symbol_action == '@RETURN_VOID':
+#         # return new_grammer.RETURN_VOID()
+#         print('ret@RETURN_VOID')
+
+#     elif symbol_action == '@RETURN_VALUE':
+#         # return new_grammer.RETURN_VALUE(current_token)
+#         print('ret@RETURN_VALUE')
+
+#     elif symbol_action == '@ASSIGN':
+#         # return new_grammer.ASSIGN()
+#         print('ret@ASSIGN')
+
+#     elif symbol_action == '@ARR_ADDR':
+#         # return new_grammer.ARR_ADDR()
+#         print('ret@ARR_ADDR')
+
+#     elif symbol_action == '@SAVE_RELOP_RESULT':
+#         # return new_grammer.SAVE_RELOP_RESULT()
+#         print('ret@SAVE_RELOP_RESULT')
+
+#     elif symbol_action == '@ADD_SUB':
+#         # new_grammer.ADD_SUB()
+#         print('ret@ADD_SUB')
+
+#     elif symbol_action == '@MULT':
+#         # return new_grammer.MULT()
+#         print('ret@MULT')
+
+#     elif symbol_action == '@SAVE_CONST':
+#         # return new_grammer.SAVE_CONST()
+#         print('ret@SAVE_CONST')
+
+#     elif symbol_action == '@CHECK_ARGS' :
+#         # return new_grammer.CHECK_ARGS()
+#         print('ret@CHECK_ARGS')
+
+#     elif symbol_action == '@ASSIGN_ARG':
+#         # return new_grammer.ASSIGN_ARG()
+#         print('ret@ASSIGN_ARG')
+
+#     elif symbol_action == '@NEG':
+#         # return new_grammer.NEG()
+#         print('ret@NEG')
+
+#     else:
+#         return
+
 
 
 def add_to_parsing_table(non_terminal, terminal, production):
@@ -599,13 +864,15 @@ def add_to_parsing_table(non_terminal, terminal, production):
         terminal = '$'
     if production is None:
         production = 'epsilon'
-    if non_terminal not in parsing_table:
+    if non_terminal not in parsing_table and non_terminal not in symbol_actions :
         parsing_table[non_terminal] = {}
     parsing_table[non_terminal][terminal] = production
 
 for rule in grammar_rules:
     A = rule['left']
     alpha = rule['right']
+    beta = mapping[A + ',' + ' '.join(alpha)]
+    #print('alpha = ',alpha, "    beta =" ,beta)
 
     # Initially, get the first set of the first symbol
     first_of_alpha = set(first_sets[alpha[0]] if alpha[0] in first_sets else firstSetOfNonTerminals[alpha[0]])
@@ -622,14 +889,15 @@ for rule in grammar_rules:
     # Add rules to the parsing table
     for symbol in first_of_alpha:
         if symbol != 'epsilon':
-            add_to_parsing_table(A, symbol, alpha)
+            add_to_parsing_table(A, symbol, beta)
             if '$' in symbol:
-                add_to_parsing_table(A, '$', alpha)
+                add_to_parsing_table(A, '$', beta)
 
     # Handle epsilon transitions
     if 'epsilon' in first_of_alpha:
         for follow_symbol in follow_sets[A]:
-            add_to_parsing_table(A, follow_symbol, alpha)
+            add_to_parsing_table(A, follow_symbol, beta)
+
 
 
 
@@ -639,20 +907,12 @@ def add_synch_to_parsing_table(parsing_table, follow_sets):
             if f not in terminals :
 
                 parsing_table[non_terminal][f] = 'synch'
-
-
-
-
-
 add_synch_to_parsing_table(parsing_table, follow_sets)
 
-# print(parsing_table)
-
-# print(parsing_table['Program'])
+print('table=',parsing_table['VarDeclarationPrime'])
 # df = pd.DataFrame.from_dict(parsing_table, orient='index').fillna('')
 # output_path = 'parsing_table.csv'
 # df.to_csv(output_path, index=True)
-
 
 token_lists = {}
 last_number = 0
@@ -669,12 +929,6 @@ for line_number in sorted(tokens_table):
 
 token_lists[last_number].append(('$','$'))
 
-# print(token_lists)
-
-
-# print("SimpleExpressionPrime" , parsing_table['SimpleExpressionPrime'])
-
-
 
 from anytree import Node, RenderTree
 def parse(token_lists, parsing_table, first_sets, follow_sets):
@@ -682,61 +936,87 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     stack = [('Program', root)]
     errors = []
     eof_error = False
-
+    symbol_stack = []
     flat_token_list = [(line_num, token) for line_num, tokens in sorted(token_lists.items()) for token in tokens]
-    # print(len(flat_token_list))
-
     index = 0
+    prev_token = None
     while stack and index < len(flat_token_list):
 
         line_num, (token_type, token_value) = flat_token_list[index]
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
-        # print('token  = ', token , "index ", index)
-        # print(' stack' , [x[0] for x in stack])
-        
+        print('t=',token)
         top, current_node = stack.pop()
-        if top == token:
-            Node(f"({token_type}, {token_value})", parent=current_node)
-            index += 1
-        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] not in ['synch', None] and top != 'epsilon':
-            production = parsing_table[top][token]
-            # print("push production ",production )
-            if top != 'Program':
-                new_node = Node(top, parent=current_node)
+        print('top =' , top)
+        if top[0] == '@':
+            symbol_stack.append(top)
+            print('ss=',symbol_stack)
+            if top not in before_symbols:
+                print('prevtoken =' , prev_token , 'prevtop =' , prev_top)
+                if prev_top == prev_token[0] :
+                    actt = symbol_stack.pop()
+                    code_generator(actt, prev_token[1])
+                    if ( stack[len(stack)-1][0]  == '@S'):
+                        stack.pop()
+                        code_generator('@S', prev_token[1])
 
-            for symbol in reversed(production):
-                stack.append((symbol, new_node if top != 'Program' else root))
 
-            if production == 'epsilon':
-                Node('epsilon', parent=new_node if top != 'Program' else root)
 
-        elif top == 'epsilon':
-            Node('epsilon', parent=current_node)
-            # print("*")
+        else: 
 
-        elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] == 'synch' or (top in keys and token in keys and top != token):            errors.append(f"#{line_num} : syntax error, missing {top}")
-            # print("**")
+            if top == token:
+                Node(f"({token_type}, {token_value})", parent=current_node)
+                index += 1
+                prev_token = ( token , token_value)
+                prev_top = top
 
-        elif ( top not in parsing_table) or( token not in parsing_table[top]):
-            # print("****")
-            if ( token == '$' and top != 'epsilon' ) :
-                eof_error = True
-                errors.append(f"#{line_num + 1} : syntax error, Unexpected EOF")
-            else : 
+                if len(symbol_stack) > 0:
+                    action = symbol_stack.pop()
+                    print('action=', action)
+                    code_generator(action, token_value)
+            elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] not in ['synch', None] and top != 'epsilon':
+                production = parsing_table[top][token]
+                if top != 'Program':
+                    new_node = Node(top, parent=current_node)
+
+                for symbol in reversed(production):
+                    stack.append((symbol, new_node if top != 'Program' else root))
+
+                if production == 'epsilon':
+                    Node('epsilon', parent=new_node if top != 'Program' else root)
+
+            elif top == 'epsilon':
+                Node('epsilon', parent=current_node)
+                if token == '$':
+                    if len(symbol_stack) > 0:
+                        action = symbol_stack.pop()
+                        print('action=', action)
+                        code_generator(action, token)
+
+            
+
+                
+
+            elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] == 'synch' or (top in keys and token in keys and top != token):            
+                errors.append(f"#{line_num} : syntax error, missing {top}")
+
+
+            elif ( top not in parsing_table) or( token not in parsing_table[top]):
+
+                        if ( token == '$' and top != 'epsilon' ) :
+                            eof_error = True
+                            errors.append(f"#{line_num + 1} : syntax error, Unexpected EOF")
+                            
+                        else : 
+                            errors.append(f"#{line_num} : syntax error, illegal {token}")
+                            
+                        index += 1 
+                        stack.insert(len(stack),(top , current_node))
+                        
+            elif  top != token:
+
                 errors.append(f"#{line_num} : syntax error, illegal {token}")
-            index += 1 
-            stack.insert(len(stack),(top , current_node))
-        elif  top != token:
-            # print("%")
-            errors.append(f"#{line_num} : syntax error, illegal {token}")
-            # index += 1 
-            # stack.insert(0,(top , current_node))
-        # else :
-        #     print("moew")
 
-        
 
-    # if not errors and stack:
     if (not eof_error) :
         Node('$', parent=root)
 
@@ -747,30 +1027,9 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     return root, errors
 
 
-# # Now call the parse function with the token list
 parse_tree, parse_errors = parse(token_lists, parsing_table, first_sets, follow_sets)
 
 
-
-# def write_parse_tree(node, file, depth=0, last=True):
-#     prefix = "└── " if last else "├── "
-#     if node.symbol != 'epsilon' or (node.symbol == 'epsilon' and depth > 0):
-#         # Only write the epsilon if it's not the root node
-#         file.write('    ' * depth + (prefix if depth else '') + node.symbol + '\n')
-#     for i, child in enumerate(node.children):
-#         write_parse_tree(child, file, depth + 1, i == len(node.children) - 1)
-
-# Use the function to write the parse tree to 'parse_tree.txt'
-# with open('parse_tree.txt', 'w') as file:
-#     write_parse_tree(parse_tree, file)
-
-
-
-# Print the parse tree and the errors
-# for error in parse_errors:
-#     print(error)
-
-# Save the errors to a file
 with open('syntax_errors.txt', 'w') as error_file:
     for error in parse_errors:
 
@@ -778,3 +1037,8 @@ with open('syntax_errors.txt', 'w') as error_file:
 
     if len(parse_errors) == 0:
         error_file.write('There is no syntax error.')
+
+
+
+for d in new_grammer.Program_block :
+    print(d)
