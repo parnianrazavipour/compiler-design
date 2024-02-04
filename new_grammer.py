@@ -65,19 +65,36 @@ def get_data_memory_current_index ( ) :
 
 def current_scope() :
     return scope_stack[-1]
+
+
+
+
+def get_index_from_data_block (address) :
+     if ('@' in address) :
+          address = ( int(address[1:])  - data_block_base) // 4 
+          return address
+     elif ('#' not  in address) :
+          address =  ( int(address[1:])  - data_block_base) // 4 
+          return address
     
 
 def get_data_block_memory(address) :
+     print(address)
      if ('@' in address) :
           address = ( int(address[1:])  - data_block_base) // 4 
-          print(address)
-          print(len(data_block_memory))
+        #   print(address)
+        #   print(len(data_block_memory))
+          if ( address >= len( data_block_memory) ) :
+               return 'temp_int'
+
           address =  data_block_memory[address].memory_address
           address = ( address - data_block_base ) // 4
-          return data_block_memory[address]
+          return data_block_memory[address].type
      elif ('#' not  in address) :
           address =  ( int(address[1:])  - data_block_base) // 4 
-          return data_block_memory[address]
+          if ( address >= len( data_block_memory) ) :
+               return 'temp_int'
+          return data_block_memory[address].type
           
               
      
@@ -189,14 +206,14 @@ def error_handle(action, datas) :
 
         if '#' in a :
              a_is_int = True
-        elif ('int' in get_data_block_memory(a).type  ) :
+        elif ('int' in get_data_block_memory(a)  ) :
              a_is_int = True
         else :
              a_is_int = False
 
         if '#' in b :
              b_is_int = True
-        elif ('int' in get_data_block_memory(b).type  ) :
+        elif ('int' in get_data_block_memory(b) ) :
              b_is_int = True
         else :
              b_is_int = False
@@ -248,7 +265,7 @@ def  PID(token):
                     ss.append(f'@{address}')
         
         else:
-            ss.push('OUTPUT')
+            ss.append('OUTPUT')
             print_stack.append('print')
             
                 
@@ -381,6 +398,7 @@ def BREAK() :
         loop_stack.append(len(Program_block))
 
 def SAVE_IF () :
+    print("ss", ss)
     ss.append(len(Program_block))
     Program_block.append('EMPTY')
 
@@ -389,9 +407,11 @@ def SAVE_IF () :
 def JPF_SAVE_IF() :
     # while type(self.semantic_stack.top()) == str or self.semantic_stack.top() >= self.memory.DB.base:
     #         self.semantic_stack.pop()
+    print(ss)
     index = ss.pop()
     expression  = ss.pop()
     to_jump = len(Program_block) + 1
+    print(index)
     if Program_block[index] == 'EMPTY' :
         Program_block[index] =  ('JPF' ,  str(expression) ,  str(index)  , to_jump )
         ss.append( len(Program_block))
@@ -538,6 +558,7 @@ def MULT ( ) :
 
 
 def SAVE_RELOP_RESULT():
+        print("ss :", ss)
         a = ss.pop()
         compare  = ss.pop()
         b = ss.pop()

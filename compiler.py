@@ -687,7 +687,7 @@ def code_generator(symbol_action, current_token):
         # print('ret@RETURN_VOID')
 
     elif symbol_action == '@RETURN_VALUE':
-        return new_grammer.RETURN_VALUE(current_token)
+        return new_grammer.RETURN_VALUE()
         # print('ret@RETURN_VALUE')
 
     elif symbol_action == '@ASSIGN':
