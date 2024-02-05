@@ -3,7 +3,7 @@
 4.	(KEYWORD, int) (ID, i) (SYMBOL, ;)
 5.	(ID, i) (SYMBOL, =) (NUM, 0) (SYMBOL, ;)
 6.	(KEYWORD, while) (SYMBOL, () (ID, i) (SYMBOL, <) (ID, size) (SYMBOL, )) (SYMBOL, {)
-7.	(ID, output) (SYMBOL, () (ID, A) (SYMBOL, [) (ID, i) (SYMBOL, ]) (SYMBOL, )) (SYMBOL, ;)
+7.	(ID, output) (SYMBOL, () (ID, A) (SYMBOL, [) (NUM, 0) (SYMBOL, ]) (SYMBOL, )) (SYMBOL, ;)
 8.	(ID, i) (SYMBOL, =) (ID, i) (SYMBOL, +) (NUM, 1) (SYMBOL, ;)
 9.	(SYMBOL, })
 10.	(SYMBOL, })

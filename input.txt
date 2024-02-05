@@ -4,7 +4,7 @@ void printArray(int A[], int size)
     int i;
     i = 0;
     while ( i < size) {
-        output(A[i]);
+        output(A[0]);
         i = i + 1;
     }
 }

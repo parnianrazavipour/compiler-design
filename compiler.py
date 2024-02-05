@@ -683,7 +683,7 @@ def code_generator(symbol_action, current_token):
         # print('ret@SAVE_WHILE')
 
     elif symbol_action == '@WHILE':
-        return new_grammer.WHILE
+        return new_grammer.WHILE()
         # print('ret@WHILE')
 
     elif symbol_action == '@RETURN_VOID':
@@ -1048,8 +1048,8 @@ with open('syntax_errors.txt', 'w') as error_file:
 
 
 
-for d in new_grammer.Program_block :
-    print(d)
+for i ,  d in enumerate(new_grammer.Program_block) :
+    print(i , d)
 
 
 with open('output.txt', 'w') as file:

@@ -427,10 +427,12 @@ def DEC_ARRAY_POINTER( ) :
         data_memory_index = get_data_memory_current_index() + data_size
         data = Data(lexeme=array_name, type='arr',memory_address=data_memory_index)
         data_block_memory.append(data)
-        data = search_data_in_sb( symbol_table[current_scope()] ,array_name )
-        # symbol_table[current_scope()][array_name] = data
+        # data = search_data_in_sb( symbol_table[current_scope()] ,array_name )
+        symbol_table[current_scope()].append(data)
 
     
+
+
 
 def BREAK() :
     check = error_handle('BREAK', is_while)
@@ -480,19 +482,39 @@ def SAVE_WHILE():
     Program_block.append('EMPTY')
 
 def WHILE() :
+    print(ss)
+
+    while type(ss[-1]) == str or ss[-1] >= data_block_base:
+            ss.pop()
+    
+    print(ss)
     cond_index = ss.pop()
     expression  = ss.pop()
     to_jump = len(Program_block) + 1
-
+    
+    print("bad while " , "cond_index", cond_index , "expression" , expression , "to_jump" ,to_jump, len(Program_block) )
+    # for I , d in enumerate(Program_block) :
+    #         print(I , d)
+    # print(Program_block)
     if Program_block[cond_index] == 'EMPTY' :
-        Program_block[cond_index] =  ('JPF' ,  str(expression) ,  str(cond_index)  , to_jump )
+        print( "cry ",ss , ('JPF' ,  str(expression) , to_jump , None ) , "index :",  cond_index )
+        Program_block[cond_index] =  ('JPF' ,  str(expression) , to_jump , None )
+
     else :
          print('error')
          return
     
+
+    # while type(ss[-1]) == str or ss[-1] >= data_block_base:
+    #         ss.pop()
+    
     unconditional_jump  = ss.pop()
-    Program_block.append( 'JP', unconditional_jump ,None , None)
+    print("just check ", ( 'JP', unconditional_jump ,None , None) , len(Program_block) )
+    Program_block.append(( 'JP', unconditional_jump ,None , None))
+
     to_jump_when_break = len(Program_block)
+
+    print("shit happens", loop_stack)
 
     if(len(loop_stack)>0 ) :
          break_index = loop_stack.pop()
@@ -502,7 +524,6 @@ def WHILE() :
               Program_block[break_index] = ( ('JP', to_jump_when_break , None , None))
               
 
-    else : print('error')
 
 
 
@@ -540,9 +561,9 @@ def RETURN_VOID():
 
 
 def ASSIGN() :
-
     a = ss.pop()
     Program_block.append( ('ASSIGN', str(a), str(ss[-1]) , None ))
+    
 
 
 def att_array(b ,size):
@@ -663,10 +684,12 @@ def ARGS():
 
 
 def CHECK_OUTPUT():
+
         if (len(ss) >= 2) :
             if (( print_stack ) and (ss[len(ss)-2] == 'OUTPUT')) :
                     print('mow ',ss)
                     to_print_add = ss.pop()
+                    print("eshgh" , ('PRINT',to_print_add , None , None)  , "ss :", ss)
                     Program_block.append(('PRINT',to_print_add , None , None) )
                     print('added')
                     ss.pop()
@@ -803,6 +826,8 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
         return_value_temp = get_temp_index()
         Program_block.append(('ASSIGN', f'#{return_value_temp}', f'@{top_sp}', None))
 
+        print("not sure", ('JP', called_function.memory_address, None, None) )
+
         Program_block.append(('JP', called_function.memory_address, None, None))
 
         print("call_stack befor ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
@@ -816,7 +841,9 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
         print("fairy tale",  start_of_new_statement, start_of_function_call_instructions - 1 )
 
         for i in range( start_of_new_statement, start_of_function_call_instructions - 1):
-            
+
+            if ( Program_block[i][0] == 'JP') :
+                print("yes !",  Program_block[i] )
             Program_block.append(Program_block[i])
 
         return return_value_temp
@@ -863,6 +890,7 @@ def S():
 def CHECK_ARGS():
         
         if 'args_func' not in ss:
+            print("groot", ss)
             return
         arguments = []
 
@@ -890,6 +918,7 @@ def CHECK_ARGS():
         #           arguments.append(ss.pop())
 
         if (check_is_print (arguments)) :
+             print("hush")
              ss.append(arguments[-1])
              return
         else :
@@ -965,7 +994,7 @@ grammar_rules =  [
   { left: 'ExpressionStmt', right: ['break' , '@BREAK', ';' , '@S'] },
   { left: 'ExpressionStmt', right: [';', '@S'] },
   { left: 'SelectionStmt', right: ['if', '(', 'Expression', ')' , '@SAVE_IF' , 'Statement', 'else','@JPF_SAVE_IF', 'Statement' ,'@JP_IF'] },
-  { left: 'IterationStmt', right: ['while','@LABEL', '(', 'Expression', ')','@SAVE_WHILE', 'Statement', '@WHILE'] },
+  { left: 'IterationStmt', right: ['while','@LABEL', '(', 'Expression', ')','@SAVE_WHILE', 'Statement', '@WHILE' , '@S' ] },
   { left: 'ReturnStmt', right: ['return', 'ReturnStmtPrime' ] },
   { left: 'ReturnStmtPrime', right: [ '@RETURN_VOID', ';', '@S'] },
   { left: 'ReturnStmtPrime', right: ['Expression', '@RETURN_VALUE', ';' , '@S'] },
