@@ -12,6 +12,7 @@ temp_base = 1000
 temp_current_index = -4
 data_size = 4
 top_sp = 500
+STACK_PLACE =  5000
 fsp = 4000
 we_have_aregs = False
 print_stack = []
@@ -79,7 +80,7 @@ def get_index_from_data_block (address) :
 
 def get_data_block_memory(address) :
      print(address)
-     if ('@' in address) :
+     if ('@' in str(address)) :
           address = ( int(address[1:])  - data_block_base) // 4 
         #   print(address)
         #   print(len(data_block_memory))
@@ -89,8 +90,8 @@ def get_data_block_memory(address) :
           address =  data_block_memory[address].memory_address
           address = ( address - data_block_base ) // 4
           return data_block_memory[address].type
-     elif ('#' not  in address) :
-          address =  ( int(address[1:])  - data_block_base) // 4 
+     elif ('#' not  in str(address)) :
+          address =  ( int(address)  - data_block_base) // 4 
           if ( address >= len( data_block_memory) ) :
                return 'temp_int'
           return data_block_memory[address].type
@@ -161,14 +162,14 @@ def error_handle(action, datas) :
         a , b = datas[0] , datas[1]
         a_is_int , b_is_int = False , False
 
-        if '#' in a :
+        if '#' in str(a) :
              a_is_int = True
         elif ('int' in get_data_block_memory(a) ) :
              a_is_int = True
         else :
              a_is_int = False
 
-        if '#' in b :
+        if '#' in str(b) :
              b_is_int = True
         elif ('int' in get_data_block_memory(b) ) :
              b_is_int = True
@@ -186,14 +187,14 @@ def error_handle(action, datas) :
         a , b = datas[0] , datas[1]
         a_is_int , b_is_int = False , False
 
-        if '#' in a :
+        if '#' in str(a) :
              a_is_int = True
         elif ('int' in get_data_block_memory(a)  ) :
              a_is_int = True
         else :
              a_is_int = False
 
-        if '#' in b :
+        if '#' in str(b) :
              b_is_int = True
         elif ('int' in get_data_block_memory(b)  ) :
              b_is_int = True
@@ -210,14 +211,14 @@ def error_handle(action, datas) :
         a , b = datas[0] , datas[1]
         a_is_int , b_is_int = False , False
 
-        if '#' in a :
+        if '#' in str(a) :
              a_is_int = True
         elif ('int' in get_data_block_memory(a)  ) :
              a_is_int = True
         else :
              a_is_int = False
 
-        if '#' in b :
+        if '#' in str(b) :
              b_is_int = True
         elif ('int' in get_data_block_memory(b) ) :
              b_is_int = True
@@ -236,7 +237,7 @@ def error_handle(action, datas) :
 
 def get_ofs(data1, data2 ) :
     print("mommy ", data1.lexeme , data2.lexeme  )
-    return data1.memory_address - data2.memory_address  + 4
+    return data1.memory_address - data2.memory_address  + 8
     
 
 
@@ -263,8 +264,11 @@ def  PID(token):
                         
                         if ( data1.lexeme == 'main' ) :
                             is_global_or_main = True
-
-
+  
+                if current_scope() == 'main' :
+                    for d in symbol_table[current_scope()] :
+                        if d.lexeme == name :
+                            is_global_or_main = True
                 
                 if (name in global_sb) :
                     is_global_or_main = True
@@ -281,6 +285,7 @@ def  PID(token):
 
                 if not is_global_or_main  :
                     address = get_temp_index()
+                    print("gooz", ('ADD', top_sp, f'#{offset}', address))
                     Program_block.append(('ADD', top_sp, f'#{offset}', address))
                     ss.append(f'@{address}')
         
@@ -314,9 +319,11 @@ def get_data_by_name(self, name):
 
 def SAVE(token):
     if ( len(Program_block) ==0) :
-         print('SHASH')
-         t = get_temp_index()
-         Program_block.append (('ASSIGN', '#0' , t, '')) 
+        Program_block.append(('ASSIGN', '#10000', str(data_block_base - 4) , None))
+        Program_block.append(('ASSIGN', '#10000', str(STACK_PLACE - 4) , None))
+        Program_block.append(('ASSIGN', f'#{STACK_PLACE}' ,fsp ,  None))
+        Program_block.append(('ASSIGN',  f'#{top_sp + 4}' , top_sp ,   None))
+        Program_block.append('EMPTY')
     if(token=='+'):
         token = 'ADD'
     if(token == '-'):
@@ -350,7 +357,7 @@ def DEC_ARRAY( ) :
     array_name = ss.pop()
     data_memory_index = get_data_memory_current_index() 
     array_start_index = data_memory_index
-    for i in range(size) :
+    for i in range(int(size)) :
         data_memory_index +=data_size
         data = Data(lexeme=array_name, type='arr_int_val',memory_address=data_memory_index,  array_size = size )
         data_block_memory.append(data)
@@ -368,11 +375,19 @@ def DEC_FUNCTION( ) :
     return_type = ss.pop()
     scope_stack.append(func_name)
     if (func_name == 'main') :
+        # Program_block[0](('ASSIGN', '#10000', str(data_block_base - 4) , None))
+        # Program_block[1](('ASSIGN', '#10000', str(STACK_PLACE - 4) , None))
+        # Program_block[2](('ASSIGN', f'#{STACK_PLACE}' ,fsp ,  None))
+        # Program_block[3](('ASSIGN',  f'#{top_sp + 4}' , top_sp ,   None))
+
+
         current_pb_index = len(Program_block)
-        Program_block[0]  =  ('JP' , str(current_pb_index) ,None , None ) 
+        Program_block[4]  =  ('JP' , str(current_pb_index) ,None , None ) 
 
     data = Data(lexeme=func_name , type = 'func_'+ return_type, memory_address= len(Program_block) )
     # ?
+
+    
     
     if error_handle( 'DEC_FUNC', func_name):
         global_sb[func_name] = data
@@ -523,15 +538,10 @@ def RETURN_VOID():
 
 
 def ASSIGN() :
-    
     a = ss.pop()
     b = ss.pop()
     print('a' , a , 'b' , b)
-
-    # if (str(a) == '#0' , b == 1) :
-    #      print("shiiiiiiiit")
-    #      exit(0)
-    Program_block.append( ('ASSIGN_hi', str(a), str(b) ))
+    Program_block.append( ('ASSIGN', str(a), str(b) , None ))
 
 
 def att_array(b ,size):
@@ -544,8 +554,8 @@ def att_array(b ,size):
 
 def const_array(b ,size):
     t1 = get_temp_index()
-    Program_block.append('ADD', f'#{b}' , size, t1 )
-    ss.push(f'@{t1}')
+    Program_block.append(('ADD', f'#{b}' , size, t1 ))
+    ss.append(f'@{t1}')
 
 def cal_array_size(ofs):
     temp_size  = get_temp_index()
@@ -558,7 +568,7 @@ def ARR_ADDR() :
     ofs = ss.pop()
     b = ss.pop()
     temp_size =  cal_array_size(ofs)
-    if ('@' not in b ) :
+    if ('@' not in str(b) ) :
         const_array(b , temp_size )
     else : cal_array_size()
 
@@ -574,7 +584,7 @@ def ADD_SUB( ) :
     b = ss.pop()
     t = get_temp_index()
     if error_handle('ADD_SUB',[a,b]):
-        Program_block.append( (ADD_OR_SUB , a , b , t ))
+        Program_block.append( (ADD_OR_SUB , b , a , t ))
         
     ss.append(t)
     print("bitch", ss)
@@ -703,7 +713,8 @@ def att_arg(argument , t) :
 
 def pass_args(arguments, called_function, start ) :
      func_args = called_function.args
-     for i in range(arguments) :
+     print(current_scope())
+     for i in range(len(arguments)) :
         arg = func_args[i]
         name = arg.lexeme
         t = get_temp_index()
@@ -711,15 +722,37 @@ def pass_args(arguments, called_function, start ) :
         data = None
 
         if (len(scope_stack) > 0 ) :
-                    current_scope = current_scope()
-                    current_symbol_table = symbol_table[current_scope]
+                    # cs = current_scope()
+                    # current_symbol_table = symbol_table[cs]
+                    # data = search_data_in_sb(current_symbol_table , name )
+                    # if ( data != None):
+                    #     # print(data , name)
+                    #     data1 = current_symbol_table[1]
+                    #     offset = get_ofs(data , data1)
+                        
+                    #     if ( data1.lexeme == 'main' ) :
+                    #         is_global_or_main = True
+
+                    current_s = current_scope()
+                    current_symbol_table = symbol_table[called_function.lexeme]
+                    print( [d.lexeme for d in current_symbol_table])
                     data = search_data_in_sb(current_symbol_table , name )
-                    data1 = current_symbol_table[0]
-                    offset = get_ofs(data , data1)
+                    
+                    if ( data != None):
+                        print('find the data ', data.lexeme, ' or ', name , 'in ' , called_function.lexeme )
+                        data1 = current_symbol_table[1]
+                        offset = get_ofs(data , data1)
+                    else :
+                         print("error in pass args" ,name , called_function.lexeme )
+                         x = []
+                         for d in current_symbol_table :
+                              x.append(d.lexeme)
+                         print(x)
 
         if ( data == None) :
              print('error')
              return
+        print( "daddy ", ('ADD', start , '#' + str(offset) , t ) )
         Program_block.append( ('ADD', start , '#' + str(offset) , t ) )
         if 'arr' not in data.type:
              Program_block.append( ('ASSIGN',arguments[i], f'@{t}', None))
@@ -735,8 +768,9 @@ def pass_args(arguments, called_function, start ) :
 
 
 def jump_and_return( size , start_of_function_call_instructions , called_function ) :
+        print(('daddy 2', top_sp, f'#{size}', top_sp))
      
-        Program_block.append(('ADD', top_sp, f'#{size}', top_sp))
+        Program_block.append(('ADD',top_sp, f'#{size}', top_sp))
         temp = get_temp_index()
         Program_block.append(('ADD', top_sp, '#4', temp))
         Program_block.append(('ASSIGN', f'#{len(Program_block)+ 3}', f'@{temp}', None))
@@ -745,12 +779,20 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
         Program_block.append(('ASSIGN', f'#{return_value_temp}', f'@{top_sp}', None))
 
         Program_block.append(('JP', called_function.memory_address, None, None))
-        current_scope = scope_stack.pop()
-        symbol_table[current_scope] = runtime_stack.pop()
+
+        print("call_stack befor ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
+        print(scope_stack)
+        print([d[0].lexeme for d in runtime_stack])
+        scope_stack.pop()
+        symbol_table[current_scope()] = runtime_stack.pop()
+
+        print("call_stack after ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
+
+        print("fairy tale",  start_of_new_statement, start_of_function_call_instructions - 1 )
 
         for i in range( start_of_new_statement, start_of_function_call_instructions - 1):
             
-            Program_block.append(Program_block.block[i])
+            Program_block.append(Program_block[i])
 
         return return_value_temp
 
@@ -768,6 +810,12 @@ def CALL_FUNC( func , size, arguments):
         scope_stack.append(func_name)
         start_index_of_ar = get_temp_index()
 
+
+
+        print('daddy 3 ', ('ADD', top_sp, '#' + str(size) , start_index_of_ar ) )
+        for d in Program_block :
+            print(d)
+
         Program_block.append( ('ADD', top_sp, '#' + str(size) , start_index_of_ar ) )
         #arguments, called_function, start
         
@@ -777,10 +825,12 @@ def CALL_FUNC( func , size, arguments):
 
         return_value = jump_and_return(  size , start_of_function_call_instructions , func)
 
-        ss.push(return_value )
+        ss.append(return_value )
+        print("return value kiri", return_value)
 
 
 def S():
+    global start_of_new_statement
     start_of_new_statement = len(Program_block)
 
 
@@ -791,9 +841,13 @@ def CHECK_ARGS():
             return
         arguments = []
 
+        print(ss)
+
         while  len(args_stack) > 0 and ss[-1] !='args_func':
             arg = ss.pop()
             arguments.append(arg)
+
+        ss.pop()
 
         # print("b ss in check args", ss)
         # if ( len(args_stack  ) == 0 ) :
@@ -817,6 +871,7 @@ def CHECK_ARGS():
             size = 8
             arguments  = arguments[::-1]
             print("hi bitch", global_sb['foo'].memory_address , ss ,arguments)
+        
             func_mem_add = ss.pop()
             func = search_for_func(func_mem_add)
             if (len(scope_stack) != 0 ) :
@@ -832,7 +887,7 @@ def CHECK_ARGS():
              print('error in check_args')
              return 
         
-        CALL_FUNC()
+        CALL_FUNC(func , size, arguments)
         print("a ss in check args", ss)
 
         

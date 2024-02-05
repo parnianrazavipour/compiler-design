@@ -1050,3 +1050,11 @@ with open('syntax_errors.txt', 'w') as error_file:
 
 for d in new_grammer.Program_block :
     print(d)
+
+
+with open('output.txt', 'w') as file:
+    for index, instruction in enumerate( new_grammer.Program_block):
+        # Format the instruction with appropriate placeholders for None values
+        formatted_instruction = ', '.join(str(item) if item is not None else '' for item in instruction)
+        # Write the formatted instruction to the file
+        file.write(f'{index}\t({formatted_instruction})\n')
