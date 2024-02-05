@@ -1,5 +1,5 @@
 ss = []
-data_block_base = 1
+data_block_base = 512
 data_block_memory = []
 symbol_table = {}
 Program_block = []
@@ -48,8 +48,7 @@ class Data :
         self.type = type
         self.memory_address = memory_address
         self.size = size
-        if(type == 'arr_int' ) :
-            self.array_size = array_size
+        self.array_size = array_size
         self.value = 0
         self.args = []
 
@@ -104,9 +103,14 @@ def get_data_block_memory(address) :
      
     
 def search_data_in_sb(sb,name) :
+    datas = []
+    print(name)
     for data in sb[::-1] :
+        datas.append(data.lexeme)
         if data.lexeme == name :
             return data
+        
+    # print(datas)
     return None
 
 
@@ -136,10 +140,12 @@ def error_handle(action, datas) :
         else : return 
     if action == 'PID' :
         name = datas
-        current_s = current_scope()
-        if len(current_s) == 0 :
+        print(scope_stack)
+        if name in global_sb.keys() :
+             return True
+        if len(scope_stack) == 0 :
             data_in_gloabl = check_data_is_global(name)
-            if data_in_gloabl is None :
+            if data_in_gloabl is None  :
                 print('not defined error!')
                 return False
             else : return True
@@ -157,14 +163,14 @@ def error_handle(action, datas) :
 
         if '#' in a :
              a_is_int = True
-        elif ('int' in get_data_block_memory(a).type  ) :
+        elif ('int' in get_data_block_memory(a) ) :
              a_is_int = True
         else :
              a_is_int = False
 
         if '#' in b :
              b_is_int = True
-        elif ('int' in get_data_block_memory(b).type  ) :
+        elif ('int' in get_data_block_memory(b) ) :
              b_is_int = True
         else :
              b_is_int = False
@@ -182,14 +188,14 @@ def error_handle(action, datas) :
 
         if '#' in a :
              a_is_int = True
-        elif ('int' in get_data_block_memory(a).type  ) :
+        elif ('int' in get_data_block_memory(a)  ) :
              a_is_int = True
         else :
              a_is_int = False
 
         if '#' in b :
              b_is_int = True
-        elif ('int' in get_data_block_memory(b).type  ) :
+        elif ('int' in get_data_block_memory(b)  ) :
              b_is_int = True
         else :
              b_is_int = False
@@ -229,35 +235,49 @@ def error_handle(action, datas) :
 
 
 def get_ofs(data1, data2 ) :
-    return data1.memory_address - data2.memory_address  + 8
+    print("mommy ", data1.lexeme , data2.lexeme  )
+    return data1.memory_address - data2.memory_address  + 4
     
 
 
 
 
 def  PID(token):
+        print('pid',token , ss)
         adr = 0 
         name = token
         offset = 0
         address = 0
         is_global_or_main = False
         if name != 'output':
+            # print('kharrrrrr ', name, global_sb.keys())
             if error_handle('PID', name) :
                 if (len(scope_stack) > 0 ) :
                     cs = current_scope()
                     current_symbol_table = symbol_table[cs]
                     data = search_data_in_sb(current_symbol_table , name )
-                    data1 = current_symbol_table[0]
-                    offset = get_ofs(data , data1)
-                    if ( data1.lexeme == 'main' ) :
-                        is_global_or_main = True
+                    if ( data != None):
+                        # print(data , name)
+                        data1 = current_symbol_table[1]
+                        offset = get_ofs(data , data1)
+                        
+                        if ( data1.lexeme == 'main' ) :
+                            is_global_or_main = True
+
+
                 
                 if (name in global_sb) :
                     is_global_or_main = True
                 
                 if is_global_or_main :
-                    address = global_sb[name].memory_address
-                    ss.append(address)
+                    # print(name)
+                    if name in global_sb and  search_data_in_sb(symbol_table[current_scope()] , name) == None:
+                         ss.append(global_sb[name].memory_address)
+                        #  print("**" , ss)
+                    else :
+                        address = search_data_in_sb(symbol_table['main'] , name).memory_address 
+                        ss.append(address)
+                        # print('$$' , ss , is_global_or_main , name )
 
                 if not is_global_or_main  :
                     address = get_temp_index()
@@ -293,6 +313,10 @@ def get_data_by_name(self, name):
 
 
 def SAVE(token):
+    if ( len(Program_block) ==0) :
+         print('SHASH')
+         t = get_temp_index()
+         Program_block.append (('ASSIGN', '#0' , t, '')) 
     if(token=='+'):
         token = 'ADD'
     if(token == '-'):
@@ -311,7 +335,7 @@ def DEC_VARIABLE() :
     name = ss.pop()
     type = ss.pop()
     if error_handle('DEC_VARIABLE' ,[name, type]) :
-        data_memory_index = get_data_memory_current_index() + data_block_base + data_size 
+        data_memory_index = get_data_memory_current_index() + data_size 
         data = Data(lexeme = name ,type = type , memory_address = data_memory_index)
         # added to memory
         data_block_memory.append(data)
@@ -324,7 +348,7 @@ def DEC_VARIABLE() :
 def DEC_ARRAY( ) :
     size = ss.pop()
     array_name = ss.pop()
-    data_memory_index = get_data_memory_current_index() + data_block_base 
+    data_memory_index = get_data_memory_current_index() 
     array_start_index = data_memory_index
     for i in range(size) :
         data_memory_index +=data_size
@@ -345,9 +369,9 @@ def DEC_FUNCTION( ) :
     scope_stack.append(func_name)
     if (func_name == 'main') :
         current_pb_index = len(Program_block)
-        Program_block.append(  ('JP' , str(current_pb_index) ,None , None ) ) 
+        Program_block[0]  =  ('JP' , str(current_pb_index) ,None , None ) 
 
-    data = Data(lexeme=func_name , type = 'func_'+ return_type, memory_address= get_data_memory_current_index() + data_size )
+    data = Data(lexeme=func_name , type = 'func_'+ return_type, memory_address= len(Program_block) )
     # ?
     
     if error_handle( 'DEC_FUNC', func_name):
@@ -384,7 +408,7 @@ def DEC_ARRAY_POINTER( ) :
     # size = ss.pop()
     array_name = ss.pop()
     if error_handle('DEC_VARIABLE' ,[array_name, type]) :
-        data_memory_index = get_data_memory_current_index() + data_block_base + data_size 
+        data_memory_index = get_data_memory_current_index() + data_size 
         data = Data(lexeme=array_name, type='Pointer',memory_address=data_memory_index)
         data_block_memory.append(data)
         symbol_table[current_scope()][array_name] = data
@@ -400,8 +424,8 @@ def BREAK() :
 def SAVE_IF () :
     print("ss", ss)
     ss.append(len(Program_block))
-    Program_block.append('EMPTY')
 
+    Program_block.append('EMPTY')
 
 
 def JPF_SAVE_IF() :
@@ -411,19 +435,23 @@ def JPF_SAVE_IF() :
     index = ss.pop()
     expression  = ss.pop()
     to_jump = len(Program_block) + 1
-    print(index)
+    print('marg',index)
     if Program_block[index] == 'EMPTY' :
-        Program_block[index] =  ('JPF' ,  str(expression) ,  str(index)  , to_jump )
+        Program_block[index] =  ('JPF' ,  str(expression) ,  to_jump , None )
         ss.append( len(Program_block))
+        print("padarsag", len(Program_block) )
         Program_block.append('EMPTY')
+
     else : print('ERROR')
 
 def JP_IF( ) :
     # while type(self.semantic_stack.top()) == str or self.semantic_stack.top() >= self.memory.DB.base:
     #     self.semantic_stack.pop()
+    print(ss)
     index = ss.pop()
+    print(index)
     jump_to = len(Program_block)
-    if Program_block == 'EMPTY' :
+    if Program_block[index]== 'EMPTY' :
         Program_block[index] = ( 'JP', str(jump_to) , None , None)
 
     
@@ -462,6 +490,8 @@ def WHILE() :
 
 
 def RETURN_VALUE():
+        print("len :", len(Program_block))
+        print("GA ", ss)
         return_value = ss.pop()
         temp = get_temp_index()
         Program_block.append(('ASSIGN', f'@{top_sp}', temp, None))
@@ -495,10 +525,13 @@ def RETURN_VOID():
 def ASSIGN() :
     
     a = ss.pop()
-    print('a' , a)
-
     b = ss.pop()
-    Program_block.append( ('ASSIGN', str(a), str(b) ))
+    print('a' , a , 'b' , b)
+
+    # if (str(a) == '#0' , b == 1) :
+    #      print("shiiiiiiiit")
+    #      exit(0)
+    Program_block.append( ('ASSIGN_hi', str(a), str(b) ))
 
 
 def att_array(b ,size):
@@ -535,13 +568,16 @@ def ARR_ADDR() :
 
 def ADD_SUB( ) :
     # t = a + b
+    print("hi ",ss)
     a = ss.pop()
     ADD_OR_SUB  = ss.pop()
     b = ss.pop()
     t = get_temp_index()
-    if error_handle('ADD_SUB',a,b):
+    if error_handle('ADD_SUB',[a,b]):
         Program_block.append( (ADD_OR_SUB , a , b , t ))
+        
     ss.append(t)
+    print("bitch", ss)
  
 
 
@@ -565,7 +601,7 @@ def SAVE_RELOP_RESULT():
         t = get_temp_index()
 
         if error_handle('COMPARE' , [a , b]):
-            Program_block.append( (compare , a , b , t ))
+            Program_block.append( (compare , b , a , t ))
         ss.append(t)
 
 
@@ -585,27 +621,32 @@ def NEG() :
 
 
 def ARGS():
-        if (print_stack.is_empty() and  (ss[-1] != 'OUTPUT') ):
+        if ( ( not print_stack ) and  (ss[-1] != 'OUTPUT') ):
              ss.append("args_func")
              args_stack.append('args_func')
+        
 
 
 
 def CHECK_OUTPUT():
         if (len(ss) >= 2) :
-                
-            if (not print_stack.is_empty() and ss[len(ss) -2 ] == 'OUTPUT') :
+            if (( print_stack ) and (ss[len(ss)-2] == 'OUTPUT')) :
+                    print('mow ',ss)
                     to_print_add = ss.pop()
-                    Program_block.append('PRINT',to_print_add , None , None )
+                    Program_block.append(('PRINT',to_print_add , None , None) )
+                    print('added')
                     ss.pop()
                     print_stack.pop()
+                    print('mew', ss)
+                    
 
             
 
 def check_is_print(args):
-     
-     if ( not ss.is_empty() and (not print_stack.is_empty() or ss[-1] == 'OUTPUT')) :
-          if args.is_empty():
+     print('args', args)
+
+     if (  len(ss)>0 and ( len(print_stack) > 0  or ss[-1] == 'OUTPUT')) :
+          if not args:
                print('error')
                return False
           else :
@@ -622,18 +663,15 @@ def search_for_func(address) :
      return None
 
 
-
-def check_args():
-     current_scope
      
 
 def get_offset_func(current_sb) :
-     return current_sb[-1].memory_address - current_sb[-1].memory_address + 12
+     return current_sb[-1].memory_address - current_sb[1].memory_address + 12
 
 
 
 
-def get_the_first_fuction(size) :
+def GET_FF(size) :
             ff = -1
             index = 0
             for name  in global_sb:
@@ -748,23 +786,37 @@ def S():
 
 
 def CHECK_ARGS():
+        
+        if 'args_func' not in ss:
+            return
         arguments = []
-        func = None
-        if not args_stack.is_empty() :
-             while not ss.is_empty() :
-                  meow  = ss.pop()
-                  if(meow == 'args_func') :
-                       args_stack.pop()
-                       break
-                  arguments.append(ss.pop())
 
+        while  len(args_stack) > 0 and ss[-1] !='args_func':
+            arg = ss.pop()
+            arguments.append(arg)
+
+        # print("b ss in check args", ss)
+        # if ( len(args_stack  ) == 0 ) :
+        #      return
+             
+        # arguments = []
+        # func = None
+        # print("hi args_stack",args_stack)
+        # if len(args_stack) > 0 :
+        #      while len(ss) > 0 :
+        #           meow  = ss.pop()
+        #           if(meow == 'args_func') :
+        #                args_stack.pop()
+        #                break
+        #           arguments.append(ss.pop())
 
         if (check_is_print (arguments)) :
              ss.append(arguments[-1])
              return
         else :
             size = 8
-            arguments  = list(reversed)
+            arguments  = arguments[::-1]
+            print("hi bitch", global_sb['foo'].memory_address , ss ,arguments)
             func_mem_add = ss.pop()
             func = search_for_func(func_mem_add)
             if (len(scope_stack) != 0 ) :
@@ -773,14 +825,16 @@ def CHECK_ARGS():
                     size = get_offset_func(current_sb)
             
             if  current_scope() == 'main':
-                 size = get_the_first_fuction(size)
+                 size = GET_FF(size)
 
 
         if ( func == None):
-             print('error')
+             print('error in check_args')
              return 
         
         CALL_FUNC()
+        print("a ss in check args", ss)
+
         
 
 
@@ -807,9 +861,9 @@ grammar_rules =  [
   { left: 'Declaration', right: ['DeclarationInitial', 'DeclarationPrime'] },
   { left: 'DeclarationInitial', right: ['@SAVE','TypeSpecifier', '@SAVE', 'ID'] },
   { left: 'DeclarationPrime', right: ['FunDeclarationPrime'] },
-  { left: 'DeclarationPrime', right: ['VarDeclarationPrime','@S'] },
-  { left: 'VarDeclarationPrime', right: [';' , '@DEC_VARIABLE'] },
-  { left: 'VarDeclarationPrime', right: ['[', '@SAVE','NUM', ']',';' ,'@DEC_ARRAY'] },
+  { left: 'DeclarationPrime', right: ['VarDeclarationPrime'] },
+  { left: 'VarDeclarationPrime', right: [';' , '@DEC_VARIABLE' ,'@S'] },
+  { left: 'VarDeclarationPrime', right: ['[', '@SAVE','NUM', ']',';' ,'@DEC_ARRAY' , '@S'] },
   { left: 'FunDeclarationPrime', right: ['@DEC_FUNCTION','(', 'Params', ')','@SAVE_ARGS', 'CompoundStmt' , '@END_FUNCTION'] },
   { left: 'TypeSpecifier', right: ['int'] },
   { left: 'TypeSpecifier', right: ['void'] },
@@ -823,19 +877,19 @@ grammar_rules =  [
   { left: 'CompoundStmt', right: ['{', '@S','DeclarationList', 'StatementList', '}' , '@S'] },
   { left: 'StatementList', right: ['Statement', 'StatementList'] },
   { left: 'StatementList', right: ['epsilon'] },
-  { left: 'Statement', right: ['ExpressionStmt' ,'@S' ] },
+  { left: 'Statement', right: ['ExpressionStmt' ] },
   { left: 'Statement', right: ['CompoundStmt'] },
   { left: 'Statement', right: ['SelectionStmt'] },
   { left: 'Statement', right: ['IterationStmt'] },
   { left: 'Statement', right: ['ReturnStmt'] },
-  { left: 'ExpressionStmt', right: ['Expression', ';'] },
-  { left: 'ExpressionStmt', right: ['break' , '@BREAK', ';'] },
-  { left: 'ExpressionStmt', right: [';'] },
+  { left: 'ExpressionStmt', right: ['Expression',  ';'  , '@S'] },
+  { left: 'ExpressionStmt', right: ['break' , '@BREAK', ';' , '@S'] },
+  { left: 'ExpressionStmt', right: [';', '@S'] },
   { left: 'SelectionStmt', right: ['if', '(', 'Expression', ')' , '@SAVE_IF' , 'Statement', 'else','@JPF_SAVE_IF', 'Statement' ,'@JP_IF'] },
   { left: 'IterationStmt', right: ['while','@LABEL', '(', 'Expression', ')','@SAVE_WHILE', 'Statement', '@WHILE'] },
-  { left: 'ReturnStmt', right: ['return', 'ReturnStmtPrime' , '@S'] },
-  { left: 'ReturnStmtPrime', right: [ '@RETURN_VOID', ';'] },
-  { left: 'ReturnStmtPrime', right: ['Expression', '@RETURN_VALUE', ';'] },
+  { left: 'ReturnStmt', right: ['return', 'ReturnStmtPrime' ] },
+  { left: 'ReturnStmtPrime', right: [ '@RETURN_VOID', ';', '@S'] },
+  { left: 'ReturnStmtPrime', right: ['Expression', '@RETURN_VALUE', ';' , '@S'] },
   { left: 'Expression', right: ['SimpleExpressionZegond'] },
   { left: 'Expression', right: ['@PID' ,'ID', 'B' , '@CHECK_OUTPUT'] },
   { left: 'B', right: ['=', 'Expression' , '@ASSIGN'] },
@@ -852,7 +906,7 @@ grammar_rules =  [
   { left: 'AdditiveExpression', right: ['Term', 'D'] },
   { left: 'AdditiveExpressionPrime', right: ['TermPrime', 'D'] },
   { left: 'AdditiveExpressionZegond', right: ['TermZegond', 'D'] },
-  { left: 'D', right: ['Addop', 'Term','@ADD_SUB' 'D'] },
+  { left: 'D', right: ['Addop', 'Term','@ADD_SUB' ,'D'] },
   { left: 'D', right: ['epsilon'] },
   { left: 'Addop', right: ['@SAVE','+'] },
   { left: 'Addop', right: ['@SAVE','-'] },
@@ -879,7 +933,7 @@ grammar_rules =  [
   { left: 'SignedFactor', right: ['-', 'Factor','@NEG'] },
   { left: 'SignedFactor', right: ['Factor'] },
   { left: 'SignedFactorPrime', right: ['FactorPrime'] },
-  { left: 'FactorPrime', right: ['(', '@ARGS' 'Args', ')', '@CHECK_ARGS'] },
+  { left: 'FactorPrime', right: ['(', '@ARGS' ,'Args', ')', '@CHECK_ARGS'] },
   { left: 'FactorPrime', right: ['epsilon'] },
   { left: 'SignedFactorZegond', right: ['+', 'Factor'] },
   { left: 'SignedFactorZegond', right: ['-', 'Factor', '@NEG'] },

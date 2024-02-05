@@ -596,7 +596,7 @@ keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{'
 
 symbol_actions = ['@SAVE','@DEC_VARIABLE','@DEC_ARRAY', '@DEC_FUNCTION', '@SAVE_ARGS','@END_FUNCTION','@PID','@DEC_ARRAY_POINTER','@DEC_VARIABLE', '@BREAK', 
 '@SAVE_IF', '@JPF_SAVE_IF', '@JP_IF','@LABEL', '@SAVE_WHILE', '@WHILE','@RETURN_VOID','@RETURN_VALUE', '@ASSIGN', '@ARR_ADDR', '@SAVE_RELOP_RESULT','@ADD_SUB',
-'@MULT', '@SAVE_CONST', '@CHECK_ARGS','@ASSIGN_ARG', '@NEG']
+'@MULT', '@SAVE_CONST', '@CHECK_ARGS','@ASSIGN_ARG', '@NEG', '@ARGS', '@S']
 
 before_symbols = [ '@SAVE' , '@DEC_FUNCTION' , '@PID' ,'@RETURN_VOID' , '@SAVE_CONST', '@ASSIGN_ARG']
 
@@ -607,12 +607,16 @@ firstSetOfNonTerminals = {key: [key] for key in keys}
 
 
 def code_generator(symbol_action, current_token):
+    print("symbol_action" , symbol_action)
 
 
 
-    if symbol_action == 'CHECK_ARGS_S' :
+    if symbol_action == '@CHECK_ARGS_S' :
     #    print('ret CHECK_ARGS_S')
        return new_grammer.CHECK_ARGS_S()
+    
+    elif symbol_action == '@CHECK_OUTPUT' :
+        return new_grammer.CHECK_OUTPUT()
     
     elif symbol_action == '@S':
         #  print('ret@S')
@@ -703,7 +707,7 @@ def code_generator(symbol_action, current_token):
         # print('ret@SAVE_RELOP_RESULT')
 
     elif symbol_action == '@ADD_SUB':
-        new_grammer.ADD_SUB()
+        return new_grammer.ADD_SUB()
         # print('ret@ADD_SUB')
 
     elif symbol_action == '@MULT':
@@ -713,10 +717,13 @@ def code_generator(symbol_action, current_token):
     elif symbol_action == '@SAVE_CONST':
         return new_grammer.SAVE_CONST(current_token)
         # print('ret@SAVE_CONST')
+    
+    elif symbol_action == '@ARGS':
+        return new_grammer.ARGS()
 
     elif symbol_action == '@CHECK_ARGS' :
-        # return new_grammer.CHECK_ARGS()
-        print('ret@CHECK_ARGS')
+        return new_grammer.CHECK_ARGS()
+        # print('ret@CHECK_ARGS')
 
     elif symbol_action == '@ASSIGN_ARG':
         return new_grammer.ASSIGN_ARG()
@@ -943,10 +950,11 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     while stack and index < len(flat_token_list):
 
         line_num, (token_type, token_value) = flat_token_list[index]
+        print('line_num', line_num)
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
-        print('t=',token)
+        # print('t=',token)
         top, current_node = stack.pop()
-        print('top =' , top)
+        # print('top =' , top)
         if top[0] == '@':
             symbol_stack.append(top)
             print('ss=',symbol_stack)
