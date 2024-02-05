@@ -596,7 +596,7 @@ keys = ['epsilon', 'ID', ';', '[', ']', 'NUM', '(', ')', 'int', 'void', ',', '{'
 
 symbol_actions = ['@SAVE','@DEC_VARIABLE','@DEC_ARRAY', '@DEC_FUNCTION', '@SAVE_ARGS','@END_FUNCTION','@PID','@DEC_ARRAY_POINTER','@DEC_VARIABLE', '@BREAK', 
 '@SAVE_IF', '@JPF_SAVE_IF', '@JP_IF','@LABEL', '@SAVE_WHILE', '@WHILE','@RETURN_VOID','@RETURN_VALUE', '@ASSIGN', '@ARR_ADDR', '@SAVE_RELOP_RESULT','@ADD_SUB',
-'@MULT', '@SAVE_CONST', '@CHECK_ARGS','@ASSIGN_ARG', '@NEG', '@ARGS', '@S']
+'@MULT', '@SAVE_CONST', '@CHECK_ARGS','@ASSIGN_ARG', '@NEG', '@ARGS', '@S', '@CHECK_ARGS_S']
 
 before_symbols = [ '@SAVE' , '@DEC_FUNCTION' , '@PID' ,'@RETURN_VOID' , '@SAVE_CONST', '@ASSIGN_ARG']
 

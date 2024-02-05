@@ -288,6 +288,9 @@ def  PID(token):
                     print("gooz", ('ADD', top_sp, f'#{offset}', address))
                     Program_block.append(('ADD', top_sp, f'#{offset}', address))
                     ss.append(f'@{address}')
+                
+                print("nastaran ", token, ss  )
+                print([ (d.memory_address , d.type , d.lexeme) for d in symbol_table[current_scope()]])
         
         else:
             ss.append('OUTPUT')
@@ -295,23 +298,6 @@ def  PID(token):
             
                 
                     
-
-
-
-
-def get_data_by_name(self, name):
-                if name in self.current_symbol_table:
-                    offset = self.current_symbol_table[name].memory_address - \
-                            self.current_symbol_table[list(self.current_symbol_table.keys())[0]].memory_address + 2 * INT_SIZE
-                    is_global_or_main = 'main' in self.all_symbol_tables and \
-                                        self.all_symbol_tables['main'] == self.current_symbol_table
-                    return is_global_or_main, offset, self.current_symbol_table[name]
-                elif name in self.global_symbol_table:
-                    return True, 0, self.global_symbol_table[name]
-                else:
-                    raise Exception("name not found!")
-                
-
 
 
 
@@ -353,17 +339,30 @@ def DEC_VARIABLE() :
         
             
 def DEC_ARRAY( ) :
+    # print("befor dec array", ss)
+    # print(Program_block)
+    # for d in Program_block :
+    #     print(d)
+    global data_memory_index
+    print("size is fucking cool ", ss)
+        
     size = ss.pop()
     array_name = ss.pop()
     data_memory_index = get_data_memory_current_index() 
-    array_start_index = data_memory_index
-    for i in range(int(size)) :
-        data_memory_index +=data_size
-        data = Data(lexeme=array_name, type='arr_int_val',memory_address=data_memory_index,  array_size = size )
-        data_block_memory.append(data)
+    # data = Data(lexeme=array_name , type='arr', memory_address=data_memory_index , array_size=size)
+    # data_block_memory.append(data)
 
-    data = Data(lexeme=array_name , type='arr', memory_address=array_start_index , array_size=size)
-    symbol_table[current_scope()].append(data)
+    for i in range(int(size) ) :
+        # data_memory_index +=data_size
+             
+        data = Data(lexeme=array_name, type='arr_int_val',memory_address= get_data_memory_current_index() + 4 ,  array_size = size )
+        if ( i == 0) :
+              symbol_table[current_scope()].append(data)
+             
+        data_block_memory.append(data)
+    
+    for i in range(len(data_block_memory)) :
+         print("kill me ", data_block_memory[i].lexeme , data_block_memory[i].memory_address , data_block_memory[i].type )
 
 
 
@@ -402,7 +401,9 @@ def DEC_FUNCTION( ) :
 
 
 def SAVE_ARGS() :
+    print( "khaste shodam ", ss)
     func_name = ss.pop()
+    print()
     if ( current_scope()!= func_name ) :
          scope_stack.pop()
          scope_stack.append(func_name)
@@ -420,13 +421,14 @@ def END_FUNCTION():
 
 
 def DEC_ARRAY_POINTER( ) :
-    # size = ss.pop()
     array_name = ss.pop()
+    type = ss.pop()
     if error_handle('DEC_VARIABLE' ,[array_name, type]) :
-        data_memory_index = get_data_memory_current_index() + data_size 
-        data = Data(lexeme=array_name, type='Pointer',memory_address=data_memory_index)
+        data_memory_index = get_data_memory_current_index() + data_size
+        data = Data(lexeme=array_name, type='arr',memory_address=data_memory_index)
         data_block_memory.append(data)
-        symbol_table[current_scope()][array_name] = data
+        data = search_data_in_sb( symbol_table[current_scope()] ,array_name )
+        # symbol_table[current_scope()][array_name] = data
 
     
 
@@ -538,10 +540,9 @@ def RETURN_VOID():
 
 
 def ASSIGN() :
+
     a = ss.pop()
-    b = ss.pop()
-    print('a' , a , 'b' , b)
-    Program_block.append( ('ASSIGN', str(a), str(b) , None ))
+    Program_block.append( ('ASSIGN', str(a), str(ss[-1]) , None ))
 
 
 def att_array(b ,size):
@@ -564,13 +565,36 @@ def cal_array_size(ofs):
 
 
 
+# def calculate_array_address(self, current_token):
+#         temp = self.temp_block.get_temp()
+#         temp2 = self.temp_block.get_temp()
+#         offset = self.semantic_stack.pop()
+#         base = self.semantic_stack.pop()
+#         mult_instruction = Instruction('MULT', '#4', offset, temp)
+#         self.program_block.add_instruction(mult_instruction)
+#         if str(base).startswith('@'):
+#             temp_array_base = self.temp_block.get_temp()
+#             self.program_block.add_instruction(Instruction('ASSIGN', base, temp_array_base, ''))
+#             add_instruction = Instruction('ADD', temp_array_base, temp, temp2)
+#         else:
+#             add_instruction = Instruction('ADD', '#' + str(base), temp, temp2)
+#         self.program_block.add_instruction(add_instruction)
+#         self.semantic_stack.push('@' + str(temp2))
+
+
+
+
+
 def ARR_ADDR() :
+    print(ss)
     ofs = ss.pop()
     b = ss.pop()
+    print("mobina", b)
     temp_size =  cal_array_size(ofs)
     if ('@' not in str(b) ) :
         const_array(b , temp_size )
-    else : cal_array_size()
+    else :
+         cal_array_size(ofs)
 
 
 
@@ -713,6 +737,7 @@ def att_arg(argument , t) :
 
 def pass_args(arguments, called_function, start ) :
      func_args = called_function.args
+     print("func_args" , func_args[0].lexeme)
      print(current_scope())
      for i in range(len(arguments)) :
         arg = func_args[i]
@@ -870,7 +895,6 @@ def CHECK_ARGS():
         else :
             size = 8
             arguments  = arguments[::-1]
-            print("hi bitch", global_sb['foo'].memory_address , ss ,arguments)
         
             func_mem_add = ss.pop()
             func = search_for_func(func_mem_add)
