@@ -448,8 +448,8 @@ def SAVE_IF () :
 
 
 def JPF_SAVE_IF() :
-    # while type(self.semantic_stack.top()) == str or self.semantic_stack.top() >= self.memory.DB.base:
-    #         self.semantic_stack.pop()
+    while type(ss[-1]) == str or ss[-1] >= data_block_base:
+            ss.pop()
     print(ss)
     index = ss.pop()
     expression  = ss.pop()
@@ -464,8 +464,9 @@ def JPF_SAVE_IF() :
     else : print('ERROR')
 
 def JP_IF( ) :
-    # while type(self.semantic_stack.top()) == str or self.semantic_stack.top() >= self.memory.DB.base:
-    #     self.semantic_stack.pop()
+    while type(ss[-1]) == str or ss[-1] >= data_block_base:
+            ss.pop()
+
     print(ss)
     index = ss.pop()
     print(index)
@@ -569,9 +570,10 @@ def ASSIGN() :
 def att_array(b ,size):
     t1 = get_temp_index()
     base_t = get_temp_index()
-    Program_block.append('ASSIGN', b , base_t , None )
-    Program_block.append('ADD', base_t , size, t1 )
-    ss.push(f'@{t1}')
+    print("heeeey" , ('ASSIGN', b , base_t , None ) )
+    Program_block.append(('ASSIGN', b , base_t , None ))
+    Program_block.append(('ADD', base_t , size, t1 ))
+    ss.append(f'@{t1}')
 
 
 def const_array(b ,size):
@@ -586,23 +588,6 @@ def cal_array_size(ofs):
 
 
 
-# def calculate_array_address(self, current_token):
-#         temp = self.temp_block.get_temp()
-#         temp2 = self.temp_block.get_temp()
-#         offset = self.semantic_stack.pop()
-#         base = self.semantic_stack.pop()
-#         mult_instruction = Instruction('MULT', '#4', offset, temp)
-#         self.program_block.add_instruction(mult_instruction)
-#         if str(base).startswith('@'):
-#             temp_array_base = self.temp_block.get_temp()
-#             self.program_block.add_instruction(Instruction('ASSIGN', base, temp_array_base, ''))
-#             add_instruction = Instruction('ADD', temp_array_base, temp, temp2)
-#         else:
-#             add_instruction = Instruction('ADD', '#' + str(base), temp, temp2)
-#         self.program_block.add_instruction(add_instruction)
-#         self.semantic_stack.push('@' + str(temp2))
-
-
 
 
 
@@ -615,7 +600,7 @@ def ARR_ADDR() :
     if ('@' not in str(b) ) :
         const_array(b , temp_size )
     else :
-         cal_array_size(ofs)
+         att_array(b , temp_size)
 
 
 
@@ -687,9 +672,8 @@ def CHECK_OUTPUT():
 
         if (len(ss) >= 2) :
             if (( print_stack ) and (ss[len(ss)-2] == 'OUTPUT')) :
-                    print('mow ',ss)
+                    print('to print ! ',ss)
                     to_print_add = ss.pop()
-                    print("eshgh" , ('PRINT',to_print_add , None , None)  , "ss :", ss)
                     Program_block.append(('PRINT',to_print_add , None , None) )
                     print('added')
                     ss.pop()
@@ -842,7 +826,7 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
 
         for i in range( start_of_new_statement, start_of_function_call_instructions - 1):
 
-            if ( Program_block[i][0] == 'JP') :
+            if ( 'PRINT' in  Program_block[i] ) :
                 print("yes !",  Program_block[i] )
             Program_block.append(Program_block[i])
 

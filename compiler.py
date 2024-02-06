@@ -950,7 +950,7 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     while stack and index < len(flat_token_list):
 
         line_num, (token_type, token_value) = flat_token_list[index]
-        print('line_num', line_num)
+        # print('line_num', line_num)
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
         # print('t=',token)
         top, current_node = stack.pop()
