@@ -105,7 +105,7 @@ def get_data_block_memory(address) :
     
 def search_data_in_sb(sb,name) :
     datas = []
-    print(name)
+    # print(name)
     for data in sb[::-1] :
         datas.append(data.lexeme)
         if data.lexeme == name :
@@ -236,7 +236,7 @@ def error_handle(action, datas) :
 
 
 def get_ofs(data1, data2 ) :
-    print("mommy ", data1.lexeme , data2.lexeme  )
+    # print("mommy ", data1.lexeme , data2.lexeme  )
     return data1.memory_address - data2.memory_address  + 8
     
 
@@ -244,7 +244,7 @@ def get_ofs(data1, data2 ) :
 
 
 def  PID(token):
-        print('pid',token , ss)
+        # print('pid',token , ss)
         adr = 0 
         name = token
         offset = 0
@@ -285,12 +285,12 @@ def  PID(token):
 
                 if not is_global_or_main  :
                     address = get_temp_index()
-                    print("gooz", ('ADD', top_sp, f'#{offset}', address))
+                    # print("gooz", ('ADD', top_sp, f'#{offset}', address))
                     Program_block.append(('ADD', top_sp, f'#{offset}', address))
                     ss.append(f'@{address}')
                 
-                print("nastaran ", token, ss  )
-                print([ (d.memory_address , d.type , d.lexeme) for d in symbol_table[current_scope()]])
+                # print("nastaran ", token, ss  )
+                # print([ (d.memory_address , d.type , d.lexeme) for d in symbol_table[current_scope()]])
         
         else:
             ss.append('OUTPUT')
@@ -361,8 +361,8 @@ def DEC_ARRAY( ) :
              
         data_block_memory.append(data)
     
-    for i in range(len(data_block_memory)) :
-         print("kill me ", data_block_memory[i].lexeme , data_block_memory[i].memory_address , data_block_memory[i].type )
+    # for i in range(len(data_block_memory)) :
+    #      print("kill me ", data_block_memory[i].lexeme , data_block_memory[i].memory_address , data_block_memory[i].type )
 
 
 
@@ -401,9 +401,9 @@ def DEC_FUNCTION( ) :
 
 
 def SAVE_ARGS() :
-    print( "khaste shodam ", ss)
+    # print( "khaste shodam ", ss)
     func_name = ss.pop()
-    print()
+    # print()
     if ( current_scope()!= func_name ) :
          scope_stack.pop()
          scope_stack.append(func_name)
@@ -435,13 +435,15 @@ def DEC_ARRAY_POINTER( ) :
 
 
 def BREAK() :
-    check = error_handle('BREAK', is_while)
-    if check :
-        Program_block.append('EMPTY')
+    # check = error_handle('BREAK', is_while)
+    # if check :
+        print("added break")
         loop_stack.append(len(Program_block))
+        Program_block.append('EMPTY')
+
 
 def SAVE_IF () :
-    print("ss", ss)
+    # print("ss", ss)
     ss.append(len(Program_block))
 
     Program_block.append('EMPTY')
@@ -451,15 +453,15 @@ def JPF_SAVE_IF() :
     print(ss)
     while len(ss)> 0 and (type(ss[-1]) == str or ss[-1] >= data_block_base ):
             ss.pop()
-    print(ss)
+    # print(ss)
     index = ss.pop()
     expression  = ss.pop()
     to_jump = len(Program_block) + 1
-    print('marg',index)
+    # print('marg',index)
     if Program_block[index] == 'EMPTY' :
         Program_block[index] =  ('JPF' ,  str(expression) ,  to_jump , None )
         ss.append( len(Program_block))
-        print("padarsag", len(Program_block) )
+        # print("padarsag", len(Program_block) )
         Program_block.append('EMPTY')
 
     else : print('ERROR')
@@ -484,12 +486,12 @@ def SAVE_WHILE():
     Program_block.append('EMPTY')
 
 def WHILE() :
-    print(ss)
+    # print(ss)
 
     while type( len(ss)>=0 and  ss[-1]) == str or ss[-1] >= data_block_base:
             ss.pop()
     
-    print(ss)
+    # print(ss)
     cond_index = ss.pop()
     expression  = ss.pop()
     to_jump = len(Program_block) + 1
@@ -511,18 +513,20 @@ def WHILE() :
     #         ss.pop()
     
     unconditional_jump  = ss.pop()
-    print("just check ", ( 'JP', unconditional_jump ,None , None) , len(Program_block) )
+    # print("just check ", ( 'JP', unconditional_jump ,None , None) , len(Program_block) )
     Program_block.append(( 'JP', unconditional_jump ,None , None))
 
     to_jump_when_break = len(Program_block)
 
-    print("shit happens", loop_stack)
+    # print("shit happens", loop_stack)
 
     if(len(loop_stack)>0 ) :
+         print("added the break")
          break_index = loop_stack.pop()
          if (Program_block[break_index] != 'EMPTY') :
               print('error')
          else :
+              print(('JP', to_jump_when_break , None , None))
               Program_block[break_index] = ( ('JP', to_jump_when_break , None , None))
               
 
@@ -530,8 +534,8 @@ def WHILE() :
 
 
 def RETURN_VALUE():
-        print("len :", len(Program_block))
-        print("GA ", ss)
+        # print("len :", len(Program_block))
+        # print("GA ", ss)
         return_value = ss.pop()
         temp = get_temp_index()
         Program_block.append(('ASSIGN', f'@{top_sp}', temp, None))
@@ -565,14 +569,14 @@ def RETURN_VOID():
 def ASSIGN() :
     a = ss.pop()
     Program_block.append( ('ASSIGN', str(a), str(ss[-1]) , None ))
-    print("daddy 4 = ", str(ss[-1]))
+    # print("daddy 4 = ", str(ss[-1]))
     
 
 
 def att_array(b ,size):
     t1 = get_temp_index()
     base_t = get_temp_index()
-    print("heeeey" , ('ASSIGN', b , base_t , None ) )
+    # print("heeeey" , ('ASSIGN', b , base_t , None ) )
     Program_block.append(('ASSIGN', b , base_t , None ))
     Program_block.append(('ADD', base_t , size, t1 ))
     ss.append(f'@{t1}')
@@ -594,10 +598,10 @@ def cal_array_size(ofs):
 
 
 def ARR_ADDR() :
-    print(ss)
+    # print(ss)
     ofs = ss.pop()
     b = ss.pop()
-    print("mobina", b)
+    # print("mobina", b)
     temp_size =  cal_array_size(ofs)
     if ('@' not in str(b) ) :
         const_array(b , temp_size )
@@ -624,7 +628,7 @@ def ADD_SUB( ) :
 
 
 def MULT ( ) :
-    print(ss)
+    # print(ss)
     a = ss.pop()
     b = ss.pop()
     t =  get_temp_index()
@@ -636,7 +640,7 @@ def MULT ( ) :
 
 
 def SAVE_RELOP_RESULT():
-        print("ss :", ss)
+        # print("ss :", ss)
         a = ss.pop()
         compare  = ss.pop()
         b = ss.pop()
@@ -671,24 +675,24 @@ def ARGS():
 
 
 def CHECK_OUTPUT():
-        print("lovely ", [(d.lexeme , d.memory_address ) for d in symbol_table[current_scope()]])
+        # print("lovely ", [(d.lexeme , d.memory_address ) for d in symbol_table[current_scope()]])
 
         if (len(ss) >= 2) :
             if (( print_stack ) and (ss[len(ss)-2] == 'OUTPUT')) :
-                    print('to print ! ',ss)
+                    # print('to print ! ',ss)
                     to_print_add = ss.pop()
                     Program_block.append(('PRINT',to_print_add , None , None) )
-                    print('added')
+                    # print('added')
                     
                     ss.pop()
                     print_stack.pop()
-                    print('mew', ss)
+                    # print('mew', ss)
                     
 
             
 
 def check_is_print(args):
-     print('args', args)
+    #  print('args', args)
 
      if (  len(ss)>0 and ( len(print_stack) > 0  or ss[-1] == 'OUTPUT')) :
           if not args:
@@ -771,7 +775,7 @@ def pass_args(arguments, called_function, start ) :
 
                     current_s = current_scope()
                     current_symbol_table = symbol_table[called_function.lexeme]
-                    print( [d.lexeme for d in current_symbol_table])
+                    # print( [d.lexeme for d in current_symbol_table])
                     data = search_data_in_sb(current_symbol_table , name )
                     
                     if ( data != None):
@@ -783,12 +787,12 @@ def pass_args(arguments, called_function, start ) :
                          x = []
                          for d in current_symbol_table :
                               x.append(d.lexeme)
-                         print(x)
+                        #  print(x)
 
         if ( data == None) :
              print('error')
              return
-        print( "daddy ", ('ADD', start , '#' + str(offset) , t ) )
+        # print( "daddy ", ('ADD', start , '#' + str(offset) , t ) )
         Program_block.append( ('ADD', start , '#' + str(offset) , t ) )
         if 'arr' not in data.type:
              Program_block.append( ('ASSIGN',arguments[i], f'@{t}', None))
@@ -814,17 +818,17 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
         return_value_temp = get_temp_index()
         Program_block.append(('ASSIGN', f'#{return_value_temp}', f'@{top_sp}', None))
 
-        print("not sure", ('JP', called_function.memory_address, None, None) )
+        # print("not sure", ('JP', called_function.memory_address, None, None) )
 
         Program_block.append(('JP', called_function.memory_address, None, None))
 
-        print("call_stack befor ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
-        print(scope_stack)
-        print([d[0].lexeme for d in runtime_stack])
+        # print("call_stack befor ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
+        # print(scope_stack)
+        # print([d[0].lexeme for d in runtime_stack])
         scope_stack.pop()
         symbol_table[current_scope()] = runtime_stack.pop()
 
-        print("call_stack after ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
+        # print("call_stack after ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
 
         # print("fairy tale",  start_of_new_statement, start_of_function_call_instructions - 1 )
 
@@ -852,9 +856,9 @@ def CALL_FUNC( func , size, arguments):
 
 
 
-        print('daddy 3 ', ('ADD', top_sp, '#' + str(size) , start_index_of_ar ) )
-        for d in Program_block :
-            print(d)
+        # print('daddy 3 ', ('ADD', top_sp, '#' + str(size) , start_index_of_ar ) )
+        # for d in Program_block :
+        #     print(d)
 
         Program_block.append( ('ADD', top_sp, '#' + str(size) , start_index_of_ar ) )
         #arguments, called_function, start
@@ -866,7 +870,7 @@ def CALL_FUNC( func , size, arguments):
         return_value = jump_and_return(  size , start_of_function_call_instructions , func)
 
         ss.append(return_value )
-        print("return value kiri", return_value)
+        # print("return value kiri", return_value)
 
 
 def S():
@@ -882,7 +886,7 @@ def CHECK_ARGS():
             return
         arguments = []
 
-        print(ss)
+        # print(ss)
 
         while  len(args_stack) > 0 and ss[-1] !='args_func':
             arg = ss.pop()
