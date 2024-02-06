@@ -64,6 +64,8 @@ def get_data_memory_current_index ( ) :
     return (len(data_block_memory) - 1 ) * 4 + data_block_base
 
 def current_scope() :
+    if ( len(scope_stack) == 0) :
+         return 0
     return scope_stack[-1]
 
 
@@ -82,8 +84,7 @@ def get_data_block_memory(address) :
      print(address)
      if ('@' in str(address)) :
           address = ( int(address[1:])  - data_block_base) // 4 
-        #   print(address)
-        #   print(len(data_block_memory))
+
           if ( address >= len( data_block_memory) ) :
                return 'temp_int'
 
@@ -333,7 +334,11 @@ def DEC_VARIABLE() :
         # added to memory
         data_block_memory.append(data)
         # added to symbol table 
-        symbol_table[current_scope()].append(data)
+        if ( current_scope() == 0 ) :
+             global_sb[name] = data
+            #  symbol_table['0'].append(data)
+        else : 
+            symbol_table[current_scope()].append(data)
 
 
         
@@ -357,7 +362,11 @@ def DEC_ARRAY( ) :
              
         data = Data(lexeme=array_name, type='arr_int_val',memory_address= get_data_memory_current_index() + 4 ,  array_size = size )
         if ( i == 0) :
-              symbol_table[current_scope()].append(data)
+              if ( current_scope() != 0 ) :
+                symbol_table[current_scope()].append(data)
+              else :
+                   global_sb[data.lexeme] = data
+                   
              
         data_block_memory.append(data)
     
@@ -614,6 +623,12 @@ def ARR_ADDR() :
 
 def ADD_SUB( ) :
     # t = a + b
+    with open('output.txt', 'w') as file:
+        for index, instruction in enumerate(Program_block):
+            # Format the instruction with appropriate placeholders for None values
+            formatted_instruction = ', '.join(str(item) if item is not None else '' for item in instruction)
+            # Write the formatted instruction to the file
+            file.write(f'{index}\t({formatted_instruction})\n')
     print("hi ",ss)
     a = ss.pop()
     ADD_OR_SUB  = ss.pop()
@@ -621,7 +636,9 @@ def ADD_SUB( ) :
     t = get_temp_index()
     if error_handle('ADD_SUB',[a,b]):
         Program_block.append( (ADD_OR_SUB , b , a , t ))
-        
+    else :
+         print("heyyyyyyyyyy")
+    print('saggg', ss)
     ss.append(t)
     print("bitch", ss)
  
@@ -676,7 +693,7 @@ def ARGS():
 
 def CHECK_OUTPUT():
         # print("lovely ", [(d.lexeme , d.memory_address ) for d in symbol_table[current_scope()]])
-
+        print("hey hey hey ", ss)
         if (len(ss) >= 2) :
             if (( print_stack ) and (ss[len(ss)-2] == 'OUTPUT')) :
                     # print('to print ! ',ss)
@@ -686,7 +703,7 @@ def CHECK_OUTPUT():
                     
                     ss.pop()
                     print_stack.pop()
-                    # print('mew', ss)
+                    print('mew', ss)
                     
 
             
@@ -715,7 +732,19 @@ def search_for_func(address) :
      
 
 def get_offset_func(current_sb) :
-     return current_sb[-1].memory_address - current_sb[1].memory_address + 12
+     print( "current_sb :", current_sb[0].lexeme )
+    #  for i ,  d in enumerate(Program_block) :
+    #     print(i , d)
+
+     
+    #  with open('output.txt', 'w') as file:
+    #         for index, instruction in enumerate(Program_block):
+    #             # Format the instruction with appropriate placeholders for None values
+    #             formatted_instruction = ', '.join(str(item) if item is not None else '' for item in instruction)
+    #             # Write the formatted instruction to the file
+    #             file.write(f'{index}\t({formatted_instruction})\n')
+     x = current_sb[-1].memory_address - current_sb[1].memory_address + 12
+     return x
 
 
 
@@ -886,28 +915,12 @@ def CHECK_ARGS():
             return
         arguments = []
 
-        # print(ss)
 
         while  len(args_stack) > 0 and ss[-1] !='args_func':
             arg = ss.pop()
             arguments.append(arg)
 
         ss.pop()
-
-        # print("b ss in check args", ss)
-        # if ( len(args_stack  ) == 0 ) :
-        #      return
-             
-        # arguments = []
-        # func = None
-        # print("hi args_stack",args_stack)
-        # if len(args_stack) > 0 :
-        #      while len(ss) > 0 :
-        #           meow  = ss.pop()
-        #           if(meow == 'args_func') :
-        #                args_stack.pop()
-        #                break
-        #           arguments.append(ss.pop())
 
         if (check_is_print (arguments)) :
              print("hush")
@@ -916,12 +929,14 @@ def CHECK_ARGS():
         else :
             size = 8
             arguments  = arguments[::-1]
-        
             func_mem_add = ss.pop()
             func = search_for_func(func_mem_add)
-            if (len(scope_stack) != 0 ) :
-                 if current_scope() in symbol_table :
+
+            if current_scope() in symbol_table and len(symbol_table[current_scope()]) > 1 :
+
+                    print("current_scope() : ", current_scope())
                     current_sb = symbol_table[current_scope()]
+                    print("current_sb[1].memory_address" , current_sb[-1].memory_address )
                     size = get_offset_func(current_sb)
             
             if  current_scope() == 'main':
@@ -936,8 +951,6 @@ def CHECK_ARGS():
         print("a ss in check args", ss)
 
         
-
-
 
 def CHECK_ARGS_S() :
       CHECK_ARGS()
@@ -1006,10 +1019,10 @@ grammar_rules =  [
   { left: 'AdditiveExpression', right: ['Term', 'D'] },
   { left: 'AdditiveExpressionPrime', right: ['TermPrime', 'D'] },
   { left: 'AdditiveExpressionZegond', right: ['TermZegond', 'D'] },
-  { left: 'D', right: ['Addop', 'Term','@ADD_SUB' ,'D'] },
+  { left: 'D', right: ['@SAVE' , 'Addop', 'Term','@ADD_SUB' ,'D'] },
   { left: 'D', right: ['epsilon'] },
-  { left: 'Addop', right: ['@SAVE','+'] },
-  { left: 'Addop', right: ['@SAVE','-'] },
+  { left: 'Addop', right: ['+'] },
+  { left: 'Addop', right: ['-'] },
   { left: 'Term', right: ['SignedFactor', 'G'] },
   { left: 'TermPrime', right: ['SignedFactorPrime', 'G'] },
   { left: 'TermZegond', right: ['SignedFactorZegond', 'G'] },
@@ -1020,7 +1033,7 @@ grammar_rules =  [
   { left: 'Factor', right: ['@SAVE_CONST','NUM'] },
   { left: 'VarCallPrime', right: ['(', '@ARGS' , 'Args', ')','@CHECK_ARGS' ] },
   { left: 'VarCallPrime', right: ['VarPrime'] },
-  { left: 'VarPrime', right: ['[', 'Expression', ']'] },
+  { left: 'VarPrime', right: ['[', 'Expression', ']', '@ARR_ADDR'] },
   { left: 'VarPrime', right: ['epsilon'] },
   { left: 'FactorZegond', right: ['(', 'Expression', ')'] },
   { left: 'FactorZegond', right: ['@SAVE_CONST','NUM'] },

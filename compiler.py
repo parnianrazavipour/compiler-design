@@ -977,6 +977,7 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
                 if len(symbol_stack) > 0:
                     action = symbol_stack.pop()
                     # print('action=', action)
+                    print("line_num :", line_num)
                     code_generator(action, token_value)
             elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] not in ['synch', None] and top != 'epsilon':
                 production = parsing_table[top][token]
@@ -994,6 +995,7 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
                 if token == '$':
                     if len(symbol_stack) > 0:
                         action = symbol_stack.pop()
+                        print("line_num :", line_num)
                         # print('action=', action)
                         code_generator(action, token)
 
