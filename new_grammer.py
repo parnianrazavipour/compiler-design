@@ -1,5 +1,5 @@
 ss = []
-data_block_base = 512
+data_block_base = 300
 data_block_memory = []
 symbol_table = {}
 Program_block = []
@@ -11,7 +11,7 @@ current_sb = []
 temp_base = 1000
 temp_current_index = -4
 data_size = 4
-top_sp = 500
+top_sp = 600
 STACK_PLACE =  5000
 fsp = 4000
 we_have_aregs = False
@@ -564,6 +564,7 @@ def RETURN_VOID():
 def ASSIGN() :
     a = ss.pop()
     Program_block.append( ('ASSIGN', str(a), str(ss[-1]) , None ))
+    print("daddy 4 = ", str(ss[-1]))
     
 
 
@@ -669,6 +670,7 @@ def ARGS():
 
 
 def CHECK_OUTPUT():
+        print("lovely ", [(d.lexeme , d.memory_address ) for d in symbol_table[current_scope()]])
 
         if (len(ss) >= 2) :
             if (( print_stack ) and (ss[len(ss)-2] == 'OUTPUT')) :
@@ -676,6 +678,7 @@ def CHECK_OUTPUT():
                     to_print_add = ss.pop()
                     Program_block.append(('PRINT',to_print_add , None , None) )
                     print('added')
+                    
                     ss.pop()
                     print_stack.pop()
                     print('mew', ss)
