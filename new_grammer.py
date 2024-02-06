@@ -1,5 +1,5 @@
 ss = []
-data_block_base = 300
+data_block_base = 512
 data_block_memory = []
 symbol_table = {}
 Program_block = []
@@ -11,7 +11,7 @@ current_sb = []
 temp_base = 1000
 temp_current_index = -4
 data_size = 4
-top_sp = 600
+top_sp = 500
 STACK_PLACE =  5000
 fsp = 4000
 we_have_aregs = False
@@ -448,7 +448,8 @@ def SAVE_IF () :
 
 
 def JPF_SAVE_IF() :
-    while type(ss[-1]) == str or ss[-1] >= data_block_base:
+    print(ss)
+    while len(ss)> 0 and (type(ss[-1]) == str or ss[-1] >= data_block_base ):
             ss.pop()
     print(ss)
     index = ss.pop()
@@ -485,7 +486,7 @@ def SAVE_WHILE():
 def WHILE() :
     print(ss)
 
-    while type(ss[-1]) == str or ss[-1] >= data_block_base:
+    while type( len(ss)>=0 and  ss[-1]) == str or ss[-1] >= data_block_base:
             ss.pop()
     
     print(ss)
@@ -724,7 +725,7 @@ def GET_FF(size) :
                     break
                 index += 1
 
-            ff = max(ff, 0)
+            # ff = max(ff, 0)
             type  = global_sb[list(global_sb.keys())[ff]].type
             memory_address = global_sb[list(global_sb.keys())[ff]].memory_address
             arr_size = global_sb[list(global_sb.keys())[ff]].array_size
@@ -825,13 +826,13 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
 
         print("call_stack after ", [d[0].lexeme for d in runtime_stack] , "current", current_scope() )
 
-        print("fairy tale",  start_of_new_statement, start_of_function_call_instructions - 1 )
+        # print("fairy tale",  start_of_new_statement, start_of_function_call_instructions - 1 )
 
-        for i in range( start_of_new_statement, start_of_function_call_instructions - 1):
+        # for i in range( start_of_new_statement, start_of_function_call_instructions - 1):
 
-            if ( 'PRINT' in  Program_block[i] ) :
-                print("yes !",  Program_block[i] )
-            Program_block.append(Program_block[i])
+        #     if ( 'PRINT' in  Program_block[i] ) :
+        #         print("yes !",  Program_block[i] )
+        #     Program_block.append(Program_block[i])
 
         return return_value_temp
 
@@ -957,8 +958,8 @@ grammar_rules =  [
   { left: 'DeclarationInitial', right: ['@SAVE','TypeSpecifier', '@SAVE', 'ID'] },
   { left: 'DeclarationPrime', right: ['FunDeclarationPrime'] },
   { left: 'DeclarationPrime', right: ['VarDeclarationPrime'] },
-  { left: 'VarDeclarationPrime', right: [';' , '@DEC_VARIABLE' ,'@S'] },
-  { left: 'VarDeclarationPrime', right: ['[', '@SAVE','NUM', ']',';' ,'@DEC_ARRAY' , '@S'] },
+  { left: 'VarDeclarationPrime', right: [';' , '@DEC_VARIABLE'] },
+  { left: 'VarDeclarationPrime', right: ['[', '@SAVE','NUM', ']',';' ,'@DEC_ARRAY' ] },
   { left: 'FunDeclarationPrime', right: ['@DEC_FUNCTION','(', 'Params', ')','@SAVE_ARGS', 'CompoundStmt' , '@END_FUNCTION'] },
   { left: 'TypeSpecifier', right: ['int'] },
   { left: 'TypeSpecifier', right: ['void'] },
@@ -969,7 +970,7 @@ grammar_rules =  [
   { left: 'Param', right: ['DeclarationInitial', 'ParamPrime'] },
   { left: 'ParamPrime', right: ['[', ']', '@DEC_ARRAY_POINTER'] },
   { left: 'ParamPrime', right: ['epsilon' , '@DEC_VARIABLE'] },
-  { left: 'CompoundStmt', right: ['{', '@S','DeclarationList', 'StatementList', '}' , '@S'] },
+  { left: 'CompoundStmt', right: ['{','DeclarationList', 'StatementList', '}' ] },
   { left: 'StatementList', right: ['Statement', 'StatementList'] },
   { left: 'StatementList', right: ['epsilon'] },
   { left: 'Statement', right: ['ExpressionStmt' ] },
@@ -977,14 +978,14 @@ grammar_rules =  [
   { left: 'Statement', right: ['SelectionStmt'] },
   { left: 'Statement', right: ['IterationStmt'] },
   { left: 'Statement', right: ['ReturnStmt'] },
-  { left: 'ExpressionStmt', right: ['Expression',  ';'  , '@S'] },
-  { left: 'ExpressionStmt', right: ['break' , '@BREAK', ';' , '@S'] },
+  { left: 'ExpressionStmt', right: ['Expression',  ';' ] },
+  { left: 'ExpressionStmt', right: ['break' , '@BREAK', ';'] },
   { left: 'ExpressionStmt', right: [';', '@S'] },
   { left: 'SelectionStmt', right: ['if', '(', 'Expression', ')' , '@SAVE_IF' , 'Statement', 'else','@JPF_SAVE_IF', 'Statement' ,'@JP_IF'] },
-  { left: 'IterationStmt', right: ['while','@LABEL', '(', 'Expression', ')','@SAVE_WHILE', 'Statement', '@WHILE' , '@S' ] },
+  { left: 'IterationStmt', right: ['while','@LABEL', '(', 'Expression', ')','@SAVE_WHILE', 'Statement', '@WHILE' ] },
   { left: 'ReturnStmt', right: ['return', 'ReturnStmtPrime' ] },
-  { left: 'ReturnStmtPrime', right: [ '@RETURN_VOID', ';', '@S'] },
-  { left: 'ReturnStmtPrime', right: ['Expression', '@RETURN_VALUE', ';' , '@S'] },
+  { left: 'ReturnStmtPrime', right: [ '@RETURN_VOID', ';'] },
+  { left: 'ReturnStmtPrime', right: ['Expression', '@RETURN_VALUE', ';' ] },
   { left: 'Expression', right: ['SimpleExpressionZegond'] },
   { left: 'Expression', right: ['@PID' ,'ID', 'B' , '@CHECK_OUTPUT'] },
   { left: 'B', right: ['=', 'Expression' , '@ASSIGN'] },
@@ -1013,7 +1014,7 @@ grammar_rules =  [
   { left: 'Factor', right: ['(', 'Expression', ')'] },
   { left: 'Factor', right: ['@PID','ID', 'VarCallPrime'] },
   { left: 'Factor', right: ['@SAVE_CONST','NUM'] },
-  { left: 'VarCallPrime', right: ['(', '@ARGS' , 'Args', ')','@CHECK_ARGS_S' ] },
+  { left: 'VarCallPrime', right: ['(', '@ARGS' , 'Args', ')','@CHECK_ARGS' ] },
   { left: 'VarCallPrime', right: ['VarPrime'] },
   { left: 'VarPrime', right: ['[', 'Expression', ']'] },
   { left: 'VarPrime', right: ['epsilon'] },
