@@ -3,6 +3,7 @@ data_block_base = 512
 data_block_memory = []
 symbol_table = {}
 Program_block = []
+break_check_stack = []
 scope_stack = [ ]
 global_sb = {}
 is_while = True
@@ -82,11 +83,13 @@ def get_index_from_data_block (address) :
 
 def get_data_block_memory(address) :
      print(address)
-     if ('@' in str(address)) :
+     if ('@' in str(address) ) :
           address = ( int(address[1:])  - data_block_base) // 4 
 
           if ( address >= len( data_block_memory) ) :
                return 'temp_int'
+          if ( address < 0) :
+            return 'nuh'
 
           address =  data_block_memory[address].memory_address
           address = ( address - data_block_base ) // 4
@@ -95,7 +98,11 @@ def get_data_block_memory(address) :
           address =  ( int(address)  - data_block_base) // 4 
           if ( address >= len( data_block_memory) ) :
                return 'temp_int'
+          if ( address <  0 ) :
+            return 'nuh'
+
           return data_block_memory[address].type
+          
           
               
      
@@ -125,79 +132,106 @@ def check_data_is_global(name) :
 
 
 
-def error_handle(action, datas) :
-    if action == 'DEC_VARIABLE' :
+#### added by mobina
+
+
+semantic_errors = []
+def error_handle(action, datas , line_number) :
+    if action == 'DEC_VARIABLE'   or action == 'DEC_POINT' or action == 'DEC_ARR' :
         name,type = datas[0], datas[1]
         if (type == 'void') :
-            print("error !")
+            semantic_errors.append(f"#{line_number} : Semantic Error! Illegal type of void for '{name}'.")
         else : return True
     if action == 'DEC_FUNC' :
-        if (datas in symbol_table.keys()):
-            print('error')
+        if (datas in symbol_table.keys() and datas!= 'main'):
+            # semantic_errors.append(f"#{line_number} : ")
             return False
         else : return True
     if action == 'BREAK' :
-        if(not is_while) :
+        print("break_check_stack",break_check_stack)
+        if(not break_check_stack) :
+            semantic_errors.append(f"#{line_number} : Semantic Error! No 'while' found for 'break'.")
             return False
         else : return 
     if action == 'PID' :
         name = datas
         print(scope_stack)
+        print('name for error: ' , name)
         if name in global_sb.keys() :
              return True
+             
         if len(scope_stack) == 0 :
             data_in_gloabl = check_data_is_global(name)
-            if data_in_gloabl is None  :
-                print('not defined error!')
+            if data_in_gloabl is None :
+                semantic_errors.append(f"#{line_number} : Semantic Error! '{name}' is not defined.")
+                a = ss.pop()
+                ADD_OR_SUB = ss.pop()
+                b = ss.pop()
                 return False
             else : return True
         else :
             current_sb = symbol_table[current_scope()]
             data_in_current_symbol_table = search_data_in_sb(current_sb , name)
             if data_in_current_symbol_table is None :
-                print('not defined error!')
+                semantic_errors.append(f"#{line_number} : Semantic Error! '{name}' is not defined.")
                 return False
             else : return True
 
     if action == 'ADD_SUB':
         a , b = datas[0] , datas[1]
+        if ( a == -1 or b == -1 ) :
+            return False
         a_is_int , b_is_int = False , False
+        print('hiiiiii',a ,b , len(data_block_memory) )
 
         if '#' in str(a) :
-             a_is_int = True
-        elif ('int' in get_data_block_memory(a) ) :
-             a_is_int = True
+            a_is_int = True
+        elif ('int' in get_data_block_memory(a) and  'arr' not in get_data_block_memory(a) ) :
+            a_is_int = True
         else :
-             a_is_int = False
+            a_is_int = False
 
         if '#' in str(b) :
-             b_is_int = True
-        elif ('int' in get_data_block_memory(b) ) :
-             b_is_int = True
+            b_is_int = True
+        elif ('int' in get_data_block_memory(b) and  'arr' not in get_data_block_memory(b) ) :
+            b_is_int = True
         else :
-             b_is_int = False
-        
+            b_is_int = False
+            
         if a_is_int and b_is_int :
-             return True
+            return True
         else : 
-            print('error')
+            if a_is_int == True:
+                a_type = 'int'
+            else:
+                a_type = 'array'
+
+            if b_is_int == True:
+                b_type = 'int'
+            else:
+                b_type = 'array'
+
+            semantic_errors.append(f"#{line_number} : Semantic Error! Type mismatch in operands, Got {a_type} instead of {b_type}.")
             return False
         
 
     if action == 'MULT':
         a , b = datas[0] , datas[1]
         a_is_int , b_is_int = False , False
+        a , b = datas[0] , datas[1]
+        if ( a == -1 or b == -1 ) :
+            return False
 
         if '#' in str(a) :
              a_is_int = True
-        elif ('int' in get_data_block_memory(a)  ) :
+        elif ('int' in get_data_block_memory(a) and  'arr' not in get_data_block_memory(a) ) :
              a_is_int = True
         else :
              a_is_int = False
 
         if '#' in str(b) :
              b_is_int = True
-        elif ('int' in get_data_block_memory(b)  ) :
+        elif ('int' in get_data_block_memory(b) and  'arr' not in get_data_block_memory(b) ) :
              b_is_int = True
         else :
              b_is_int = False
@@ -205,23 +239,40 @@ def error_handle(action, datas) :
         if a_is_int and b_is_int :
              return True
         else : 
-            print('error')
+            if a_is_int == True:
+                a_type = 'int'
+            else:
+                a_type = 'array'
+
+            if b_is_int == True:
+                b_type = 'int'
+            else:
+                b_type = 'array'
+
+            semantic_errors.append(f"#{line_number} : Semantic Error! Type mismatch in operands, Got {a_type} instead of {b_type}.")
             return False
         
     if action == 'COMPARE' :
         a , b = datas[0] , datas[1]
         a_is_int , b_is_int = False , False
+        print("classy",a , b)
+
+        a , b = datas[0] , datas[1]
+
+
+        if ( a == -1 or b == -1 ) :
+            return False
 
         if '#' in str(a) :
              a_is_int = True
-        elif ('int' in get_data_block_memory(a)  ) :
+        elif ('int' in get_data_block_memory(a) and  'arr' not in get_data_block_memory(a) ) :
              a_is_int = True
         else :
              a_is_int = False
 
         if '#' in str(b) :
              b_is_int = True
-        elif ('int' in get_data_block_memory(b) ) :
+        elif ('int' in get_data_block_memory(b) and  'arr' not in get_data_block_memory(b) ) :
              b_is_int = True
         else :
              b_is_int = False
@@ -229,8 +280,66 @@ def error_handle(action, datas) :
         if a_is_int and b_is_int :
              return True
         else : 
-            print('error')
+            if a_is_int == True:
+                a_type = 'int'
+            else:
+                a_type = 'array'
+
+            if b_is_int == True:
+                b_type = 'int'
+            else:
+                b_type = 'array'
+            semantic_errors.append(f"#{line_number} : Semantic Error! Type mismatch in operands, Got {a_type} instead of {b_type}. in compare" + str(a) + " " + str(b) +" "+ str(a_is_int) +" "+str(b_is_int) )
             return False
+        
+    if action == 'ASSIGN' :
+        
+        a , b = datas[0] , datas[1]
+        a_is_int , b_is_int = False , False
+        print("classy",a , b)
+        a , b = datas[0] , datas[1]
+
+
+        print("arrrrr", a , b , line_number)
+
+
+        if ( a == -1 or b == -1 ) :
+            return False
+        
+
+        if '#' in str(a) :
+             a_is_int = True
+        elif ('int' in get_data_block_memory(a) and  'arr' not in get_data_block_memory(a) ) :
+             a_is_int = True
+        else :
+             a_is_int = False
+
+        if '#' in str(b) :
+             b_is_int = True
+        elif ('int' in get_data_block_memory(b) and  'arr' not in get_data_block_memory(b) ) :
+             b_is_int = True
+        else :
+             b_is_int = False
+        
+        if a_is_int and b_is_int :
+             return True
+        else : 
+            if a_is_int == True:
+                a_type = 'int'
+            else:
+                a_type = 'array'
+
+            if b_is_int == True:
+                b_type = 'int'
+            else:
+                b_type = 'array'
+
+
+
+
+            semantic_errors.append(f"#{line_number} : Semantic Error! Type mismatch in operands, Got {a_type} instead of {b_type}.")
+
+            return False         
 
 
 
@@ -243,9 +352,10 @@ def get_ofs(data1, data2 ) :
 
 
 
-
-def  PID(token):
+def  PID(token, line_number):
         # print('pid',token , ss)
+        if ( 'main' in symbol_table ) :
+             print("dib")
         adr = 0 
         name = token
         offset = 0
@@ -253,7 +363,7 @@ def  PID(token):
         is_global_or_main = False
         if name != 'output':
             # print('kharrrrrr ', name, global_sb.keys())
-            if error_handle('PID', name) :
+            if error_handle('PID', name , line_number) :
                 if (len(scope_stack) > 0 ) :
                     cs = current_scope()
                     current_symbol_table = symbol_table[cs]
@@ -276,7 +386,7 @@ def  PID(token):
                 
                 if is_global_or_main :
                     # print(name)
-                    if name in global_sb and  search_data_in_sb(symbol_table[current_scope()] , name) == None:
+                    if name in global_sb and  search_data_in_sb(symbol_table['main'] , name) == None:
                          ss.append(global_sb[name].memory_address)
                         #  print("**" , ss)
                     else :
@@ -292,6 +402,8 @@ def  PID(token):
                 
                 # print("nastaran ", token, ss  )
                 # print([ (d.memory_address , d.type , d.lexeme) for d in symbol_table[current_scope()]])
+            else : 
+                    ss.append(-1)
         
         else:
             ss.append('OUTPUT')
@@ -304,13 +416,14 @@ def  PID(token):
 
 
 
-def SAVE(token):
+def SAVE(token , line_number):
     if ( len(Program_block) ==0) :
         Program_block.append(('ASSIGN', '#10000', str(data_block_base - 4) , None))
         Program_block.append(('ASSIGN', '#10000', str(STACK_PLACE - 4) , None))
         Program_block.append(('ASSIGN', f'#{STACK_PLACE}' ,fsp ,  None))
         Program_block.append(('ASSIGN',  f'#{top_sp + 4}' , top_sp ,   None))
         Program_block.append('EMPTY')
+        symbol_table['main'] = []
     if(token=='+'):
         token = 'ADD'
     if(token == '-'):
@@ -325,10 +438,10 @@ def SAVE(token):
 
 
 
-def DEC_VARIABLE() :
+def DEC_VARIABLE(line_number) :
     name = ss.pop()
     type = ss.pop()
-    if error_handle('DEC_VARIABLE' ,[name, type]) :
+    if error_handle('DEC_VARIABLE' ,[name, type] , line_number) :
         data_memory_index = get_data_memory_current_index() + data_size 
         data = Data(lexeme = name ,type = type , memory_address = data_memory_index)
         # added to memory
@@ -343,7 +456,7 @@ def DEC_VARIABLE() :
 
         
             
-def DEC_ARRAY( ) :
+def DEC_ARRAY(line_number) :
     # print("befor dec array", ss)
     # print(Program_block)
     # for d in Program_block :
@@ -356,6 +469,10 @@ def DEC_ARRAY( ) :
     data_memory_index = get_data_memory_current_index() 
     # data = Data(lexeme=array_name , type='arr', memory_address=data_memory_index , array_size=size)
     # data_block_memory.append(data)
+    if not error_handle('DEC_ARR' ,[array_name, type] , line_number) :
+         return
+         
+         
 
     for i in range(int(size) ) :
         # data_memory_index +=data_size
@@ -377,7 +494,7 @@ def DEC_ARRAY( ) :
 
   
 
-def DEC_FUNCTION( ) :
+def DEC_FUNCTION(line_number) :
 
     func_name = ss.pop()
     return_type = ss.pop()
@@ -397,7 +514,7 @@ def DEC_FUNCTION( ) :
 
     
     
-    if error_handle( 'DEC_FUNC', func_name):
+    if error_handle( 'DEC_FUNC', func_name , line_number):
         global_sb[func_name] = data
         symbol_table[func_name] = []
         symbol_table[func_name].append(data)
@@ -409,7 +526,7 @@ def DEC_FUNCTION( ) :
 
 
 
-def SAVE_ARGS() :
+def SAVE_ARGS(line_number) :
     # print( "khaste shodam ", ss)
     func_name = ss.pop()
     # print()
@@ -421,18 +538,22 @@ def SAVE_ARGS() :
     symbol_table[func_name][0].set_args(args)
 
 
-def END_FUNCTION():
+def END_FUNCTION(line_number):
         scope_stack.pop()
         # self.current_symbol_table = self.global_symbol_table
-        RETURN_VOID()
+        RETURN_VOID(line_number)
 
 
 
 
-def DEC_ARRAY_POINTER( ) :
+def DEC_ARRAY_POINTER( line_number) :
     array_name = ss.pop()
     type = ss.pop()
-    if error_handle('DEC_VARIABLE' ,[array_name, type]) :
+
+    if not error_handle('DEC_POINT' ,[array_name, type] , line_number) :
+         return
+         
+    if error_handle('DEC_VARIABLE' ,[array_name, type] , line_number) :
         data_memory_index = get_data_memory_current_index() + data_size
         data = Data(lexeme=array_name, type='arr',memory_address=data_memory_index)
         data_block_memory.append(data)
@@ -443,22 +564,24 @@ def DEC_ARRAY_POINTER( ) :
 
 
 
-def BREAK() :
+def BREAK(line_number) :
     # check = error_handle('BREAK', is_while)
     # if check :
+    q = 0
+    if error_handle('BREAK', q , line_number):
         print("added break")
         loop_stack.append(len(Program_block))
         Program_block.append('EMPTY')
 
 
-def SAVE_IF () :
+def SAVE_IF (line_number) :
     # print("ss", ss)
     ss.append(len(Program_block))
 
     Program_block.append('EMPTY')
 
 
-def JPF_SAVE_IF() :
+def JPF_SAVE_IF(line_number) :
     print(ss)
     while len(ss)> 0 and (type(ss[-1]) == str or ss[-1] >= data_block_base ):
             ss.pop()
@@ -475,7 +598,7 @@ def JPF_SAVE_IF() :
 
     else : print('ERROR')
 
-def JP_IF( ) :
+def JP_IF(line_number ) :
     while type(ss[-1]) == str or ss[-1] >= data_block_base:
             ss.pop()
 
@@ -487,14 +610,18 @@ def JP_IF( ) :
         Program_block[index] = ( 'JP', str(jump_to) , None , None)
 
     
-def LABEL() :
-    ss.append(len(Program_block))
+def LABEL(line_number) :
 
-def SAVE_WHILE():
+    ss.append(len(Program_block))
+    break_check_stack.append("label")
+
+def SAVE_WHILE(line_number):
     ss.append(len(Program_block))
     Program_block.append('EMPTY')
+    
 
-def WHILE() :
+
+def WHILE(line_number) :
     # print(ss)
 
     while type( len(ss)>=0 and  ss[-1]) == str or ss[-1] >= data_block_base:
@@ -510,6 +637,7 @@ def WHILE() :
     #         print(I , d)
     # print(Program_block)
     if Program_block[cond_index] == 'EMPTY' :
+
         print( "cry ",ss , ('JPF' ,  str(expression) , to_jump , None ) , "index :",  cond_index )
         Program_block[cond_index] =  ('JPF' ,  str(expression) , to_jump , None )
 
@@ -520,7 +648,7 @@ def WHILE() :
 
     # while type(ss[-1]) == str or ss[-1] >= data_block_base:
     #         ss.pop()
-    
+    break_check_stack.pop()
     unconditional_jump  = ss.pop()
     # print("just check ", ( 'JP', unconditional_jump ,None , None) , len(Program_block) )
     Program_block.append(( 'JP', unconditional_jump ,None , None))
@@ -542,7 +670,7 @@ def WHILE() :
 
 
 
-def RETURN_VALUE():
+def RETURN_VALUE(line_number):
         # print("len :", len(Program_block))
         # print("GA ", ss)
         return_value = ss.pop()
@@ -562,7 +690,7 @@ def RETURN_VALUE():
       
 
 
-def RETURN_VOID():
+def RETURN_VOID(line_number):
         temp = get_temp_index()
 
         Program_block.append(('ADD', top_sp, f'#{data_size}', temp))
@@ -575,9 +703,10 @@ def RETURN_VOID():
 
 
 
-def ASSIGN() :
+def ASSIGN(line_number) :
     a = ss.pop()
-    Program_block.append( ('ASSIGN', str(a), str(ss[-1]) , None ))
+    if ( error_handle('ASSIGN' , [ ss[-1], a], line_number)) :
+        Program_block.append( ('ASSIGN', str(a), str(ss[-1]) , None ))
     # print("daddy 4 = ", str(ss[-1]))
     
 
@@ -606,7 +735,7 @@ def cal_array_size(ofs):
 
 
 
-def ARR_ADDR() :
+def ARR_ADDR(line_number) :
     # print(ss)
     ofs = ss.pop()
     b = ss.pop()
@@ -621,7 +750,7 @@ def ARR_ADDR() :
 
 
 
-def ADD_SUB( ) :
+def ADD_SUB( line_number) :
     # t = a + b
     with open('output.txt', 'w') as file:
         for index, instruction in enumerate(Program_block):
@@ -633,8 +762,15 @@ def ADD_SUB( ) :
     a = ss.pop()
     ADD_OR_SUB  = ss.pop()
     b = ss.pop()
+    print("samaneeee",a , b)
     t = get_temp_index()
-    if error_handle('ADD_SUB',[a,b]):
+
+
+
+
+
+        
+    if error_handle('ADD_SUB',[a,b], line_number):
         Program_block.append( (ADD_OR_SUB , b , a , t ))
     else :
          print("heyyyyyyyyyy")
@@ -644,38 +780,38 @@ def ADD_SUB( ) :
  
 
 
-def MULT ( ) :
+def MULT (line_number ) :
     # print(ss)
     a = ss.pop()
     b = ss.pop()
     t =  get_temp_index()
-    if error_handle('MULT' , [a , b]) :
+    if error_handle('MULT' , [a , b] ,line_number) :
         Program_block.append( ('MULT' , a , b , t ))
     ss.append(t)
 
 
 
 
-def SAVE_RELOP_RESULT():
+def SAVE_RELOP_RESULT(line_number):
         # print("ss :", ss)
         a = ss.pop()
         compare  = ss.pop()
         b = ss.pop()
         t = get_temp_index()
 
-        if error_handle('COMPARE' , [a , b]):
+        if error_handle('COMPARE' , [a , b] , line_number):
             Program_block.append( (compare , b , a , t ))
         ss.append(t)
 
 
 
 
-def SAVE_CONST(token):
+def SAVE_CONST(token,line_number):
         ss.append('#' + token)
 
 
 
-def NEG() :
+def NEG(line_number) :
     expression_address = ss.pop()
     t = get_temp_index()
     Program_block.append(('SUB','#0',expression_address, t))
@@ -683,7 +819,10 @@ def NEG() :
 
 
 
-def ARGS():
+def ARGS(line_number):
+        
+        # if (datas in symbol_table.keys() and datas!= 'main'):
+        #     semantic_errors.append(f"#{line_number} : ")
         if ( ( not print_stack ) and  (ss[-1] != 'OUTPUT') ):
              ss.append("args_func")
              args_stack.append('args_func')
@@ -691,7 +830,7 @@ def ARGS():
 
 
 
-def CHECK_OUTPUT():
+def CHECK_OUTPUT(line_number):
         # print("lovely ", [(d.lexeme , d.memory_address ) for d in symbol_table[current_scope()]])
         print("hey hey hey ", ss)
         if (len(ss) >= 2) :
@@ -779,58 +918,63 @@ def att_arg(argument , t) :
 
 
 
-def pass_args(arguments, called_function, start ) :
+def pass_args(arguments, called_function, start , line_number) :
      func_args = called_function.args
      print("func_args" , func_args[0].lexeme)
      print(current_scope())
      for i in range(len(arguments)) :
-        arg = func_args[i]
-        name = arg.lexeme
-        t = get_temp_index()
-        offset = 0
-        data = None
+         ##### added by mobina for semantic errors
+        if i > len(func_args) - 1:
+            semantic_errors.append(f"#{line_number}  : Semantic Error! Mismatch in numbers of arguments of '{called_function.lexeme}'.")
+    ##### tab tab 
+        else:
+            arg = func_args[i]
+            name = arg.lexeme
+            t = get_temp_index()
+            offset = 0
+            data = None
 
-        if (len(scope_stack) > 0 ) :
-                    # cs = current_scope()
-                    # current_symbol_table = symbol_table[cs]
-                    # data = search_data_in_sb(current_symbol_table , name )
-                    # if ( data != None):
-                    #     # print(data , name)
-                    #     data1 = current_symbol_table[1]
-                    #     offset = get_ofs(data , data1)
+            if (len(scope_stack) > 0 ) :
+                        # cs = current_scope()
+                        # current_symbol_table = symbol_table[cs]
+                        # data = search_data_in_sb(current_symbol_table , name )
+                        # if ( data != None):
+                        #     # print(data , name)
+                        #     data1 = current_symbol_table[1]
+                        #     offset = get_ofs(data , data1)
+                            
+                        #     if ( data1.lexeme == 'main' ) :
+                        #         is_global_or_main = True
+
+                        current_s = current_scope()
+                        current_symbol_table = symbol_table[called_function.lexeme]
+                        # print( [d.lexeme for d in current_symbol_table])
+                        data = search_data_in_sb(current_symbol_table , name )
                         
-                    #     if ( data1.lexeme == 'main' ) :
-                    #         is_global_or_main = True
+                        if ( data != None):
+                            print('find the data ', data.lexeme, ' or ', name , 'in ' , called_function.lexeme )
+                            data1 = current_symbol_table[1]
+                            offset = get_ofs(data , data1)
+                        else :
+                            print("error in pass args" ,name , called_function.lexeme )
+                            x = []
+                            for d in current_symbol_table :
+                                x.append(d.lexeme)
+                            #  print(x)
 
-                    current_s = current_scope()
-                    current_symbol_table = symbol_table[called_function.lexeme]
-                    # print( [d.lexeme for d in current_symbol_table])
-                    data = search_data_in_sb(current_symbol_table , name )
-                    
-                    if ( data != None):
-                        print('find the data ', data.lexeme, ' or ', name , 'in ' , called_function.lexeme )
-                        data1 = current_symbol_table[1]
-                        offset = get_ofs(data , data1)
-                    else :
-                         print("error in pass args" ,name , called_function.lexeme )
-                         x = []
-                         for d in current_symbol_table :
-                              x.append(d.lexeme)
-                        #  print(x)
-
-        if ( data == None) :
-             print('error')
-             return
-        # print( "daddy ", ('ADD', start , '#' + str(offset) , t ) )
-        Program_block.append( ('ADD', start , '#' + str(offset) , t ) )
-        if 'arr' not in data.type:
-             Program_block.append( ('ASSIGN',arguments[i], f'@{t}', None))
-             
-        else :
-             if ( '@'  in str(arguments[i]) ) :
-                  att_arg(arguments[i])
-             else :
-                  Program_block.append ( ( 'ASSIGN',f'#{arguments[i]}', f'@{t}', None))
+            if ( data == None) :
+                print('error')
+                return
+            # print( "daddy ", ('ADD', start , '#' + str(offset) , t ) )
+            Program_block.append( ('ADD', start , '#' + str(offset) , t ) )
+            if 'arr' not in data.type:
+                Program_block.append( ('ASSIGN',arguments[i], f'@{t}', None))
+                
+            else :
+                if ( '@'  in str(arguments[i]) ) :
+                    att_arg(arguments[i])
+                else :
+                    Program_block.append ( ( 'ASSIGN',f'#{arguments[i]}', f'@{t}', None))
 
    
         
@@ -872,7 +1016,7 @@ def jump_and_return( size , start_of_function_call_instructions , called_functio
 
 
 
-def CALL_FUNC( func , size, arguments):
+def CALL_FUNC( func , size, arguments , line_number):
         func_name = func.lexeme
         current_sb =  symbol_table[current_scope()]
         func_sb = symbol_table[func_name]
@@ -892,7 +1036,7 @@ def CALL_FUNC( func , size, arguments):
         Program_block.append( ('ADD', top_sp, '#' + str(size) , start_index_of_ar ) )
         #arguments, called_function, start
         
-        pass_args(arguments, func, start_index_of_ar )
+        pass_args(arguments, func, start_index_of_ar , line_number )
 
         # size , start_of_function_call_instructions , called_function
 
@@ -908,7 +1052,7 @@ def S():
 
 
 
-def CHECK_ARGS():
+def CHECK_ARGS(line_number):
         
         if 'args_func' not in ss:
             print("groot", ss)
@@ -947,7 +1091,7 @@ def CHECK_ARGS():
              print('error in check_args')
              return 
         
-        CALL_FUNC(func , size, arguments)
+        CALL_FUNC(func , size, arguments , line_number)
         print("a ss in check args", ss)
 
         
@@ -997,7 +1141,7 @@ grammar_rules =  [
   { left: 'Statement', right: ['ReturnStmt'] },
   { left: 'ExpressionStmt', right: ['Expression',  ';' ] },
   { left: 'ExpressionStmt', right: ['break' , '@BREAK', ';'] },
-  { left: 'ExpressionStmt', right: [';', '@S'] },
+  { left: 'ExpressionStmt', right: [';'] },
   { left: 'SelectionStmt', right: ['if', '(', 'Expression', ')' , '@SAVE_IF' , 'Statement', 'else','@JPF_SAVE_IF', 'Statement' ,'@JP_IF'] },
   { left: 'IterationStmt', right: ['while','@LABEL', '(', 'Expression', ')','@SAVE_WHILE', 'Statement', '@WHILE' ] },
   { left: 'ReturnStmt', right: ['return', 'ReturnStmtPrime' ] },

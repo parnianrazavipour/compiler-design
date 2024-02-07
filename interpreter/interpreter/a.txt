@@ -1,6 +1,4 @@
-PRINT    5
-PRINT    5
-PRINT    5
-PRINT    7
-PRINT    7
-Total memory used: 17
+PRINT    4
+PRINT    4
+PRINT    12
+ERROR : Invalid access to memory

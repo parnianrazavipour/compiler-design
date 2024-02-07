@@ -606,131 +606,132 @@ firstSetOfNonTerminals = {key: [key] for key in keys}
 
 
 
-def code_generator(symbol_action, current_token):
-    print("symbol_action" , symbol_action)
+def code_generator(symbol_action, current_token, line_num):
+    print("symbol_action" , symbol_action ,current_token ,line_num )
+
 
 
 
     if symbol_action == '@CHECK_ARGS_S' :
     #    print('ret CHECK_ARGS_S')
-       return new_grammer.CHECK_ARGS_S()
+       return new_grammer.CHECK_ARGS_S(line_num)
     
     elif symbol_action == '@CHECK_OUTPUT' :
-        return new_grammer.CHECK_OUTPUT()
+        return new_grammer.CHECK_OUTPUT(line_num)
     
     elif symbol_action == '@S':
         #  print('ret@S')
-         return new_grammer.S()
+         return new_grammer.S(line_num)
 
     elif symbol_action == '@SAVE':
         # print('ret@SAVE')
-        return new_grammer.SAVE(current_token)
+        return new_grammer.SAVE(current_token,line_num)
 
     elif symbol_action == '@DEC_VARIABLE':
         # print('ret@DEC_VARIABLE')
-        return new_grammer.DEC_VARIABLE()
+        return new_grammer.DEC_VARIABLE(line_num)
 
     elif symbol_action == '@DEC_ARRAY':
         # print('ret@DEC_ARRAY')
-        return new_grammer.DEC_ARRAY()
+        return new_grammer.DEC_ARRAY(line_num)
 
     elif symbol_action == '@DEC_FUNCTION':
-        return new_grammer.DEC_FUNCTION()
+        return new_grammer.DEC_FUNCTION(line_num)
         # print('ret@DEC_FUNCTION')
 
     elif symbol_action == '@SAVE_ARGS':
-        return new_grammer.SAVE_ARGS()
+        return new_grammer.SAVE_ARGS(line_num)
         # print('ret@SAVE_ARGS')
 
     elif symbol_action == '@END_FUNCTION':
-        return new_grammer.END_FUNCTION()
+        return new_grammer.END_FUNCTION(line_num)
         # print('ret@END_FUNCTION')
 
     elif symbol_action == '@PID':
-        return new_grammer.PID(current_token)
+        return new_grammer.PID(current_token, line_num)
         # print('ret@PID')
 
     elif symbol_action == '@DEC_ARRAY_POINTER':
-        return new_grammer.DEC_ARRAY_POINTER()
+        return new_grammer.DEC_ARRAY_POINTER(line_num)
         # print('ret@DEC_ARRAY_POINTER')
 
     elif symbol_action == '@DEC_VARIABLE':
-        return new_grammer.DEC_VARIABLE()
+        return new_grammer.DEC_VARIABLE(line_num)
         # print('ret@DEC_VARIABLE')
 
     elif symbol_action == '@BREAK':
-        return new_grammer.BREAK()
+        return new_grammer.BREAK(line_num)
         # print('ret@BREAK')
 
     elif symbol_action == '@SAVE_IF':
-        return new_grammer.SAVE_IF()
+        return new_grammer.SAVE_IF(line_num)
         # print('ret@SAVE_IF')
 
     elif symbol_action == '@JPF_SAVE_IF':
-        return new_grammer.JPF_SAVE_IF()
+        return new_grammer.JPF_SAVE_IF(line_num)
         # print('ret@JPF_SAVE_IF')
 
     elif symbol_action == '@JP_IF':
-        return new_grammer.JP_IF()
+        return new_grammer.JP_IF(line_num)
         # print('ret@JP_IF')
 
     elif symbol_action == '@LABEL':
-        return new_grammer.LABEL()
+        return new_grammer.LABEL(line_num)
         # print('ret@LABEL')
 
     elif symbol_action == '@SAVE_WHILE':
-        return new_grammer.SAVE_WHILE()
+        return new_grammer.SAVE_WHILE(line_num)
         # print('ret@SAVE_WHILE')
 
     elif symbol_action == '@WHILE':
-        return new_grammer.WHILE()
+        return new_grammer.WHILE(line_num)
         # print('ret@WHILE')
 
     elif symbol_action == '@RETURN_VOID':
-        return new_grammer.RETURN_VOID()
+        return new_grammer.RETURN_VOID(line_num)
         # print('ret@RETURN_VOID')
 
     elif symbol_action == '@RETURN_VALUE':
-        return new_grammer.RETURN_VALUE()
+        return new_grammer.RETURN_VALUE(line_num)
         # print('ret@RETURN_VALUE')
 
     elif symbol_action == '@ASSIGN':
-        return new_grammer.ASSIGN()
+        return new_grammer.ASSIGN(line_num)
         # print('ret@ASSIGN')
 
     elif symbol_action == '@ARR_ADDR':
-        return new_grammer.ARR_ADDR()
+        return new_grammer.ARR_ADDR(line_num)
         # print('ret@ARR_ADDR')
 
     elif symbol_action == '@SAVE_RELOP_RESULT':
-        return new_grammer.SAVE_RELOP_RESULT()
+        return new_grammer.SAVE_RELOP_RESULT(line_num)
         # print('ret@SAVE_RELOP_RESULT')
 
     elif symbol_action == '@ADD_SUB':
-        return new_grammer.ADD_SUB()
+        return new_grammer.ADD_SUB(line_num)
         # print('ret@ADD_SUB')
 
     elif symbol_action == '@MULT':
-        return new_grammer.MULT()
+        return new_grammer.MULT(line_num)
         # print('ret@MULT')
 
     elif symbol_action == '@SAVE_CONST':
-        return new_grammer.SAVE_CONST(current_token)
+        return new_grammer.SAVE_CONST(current_token,line_num)
         # print('ret@SAVE_CONST')
     
     elif symbol_action == '@ARGS':
-        return new_grammer.ARGS()
+        return new_grammer.ARGS(line_num)
 
     elif symbol_action == '@CHECK_ARGS' :
-        return new_grammer.CHECK_ARGS()
+        return new_grammer.CHECK_ARGS(line_num)
         # print('ret@CHECK_ARGS')
 
     elif symbol_action == '@ASSIGN_ARG':
-        return new_grammer.ASSIGN_ARG()
+        return new_grammer.ASSIGN_ARG(line_num)
         # print('ret@ASSIGN_ARG')
 
     elif symbol_action == '@NEG':
-        return new_grammer.NEG()
+        return new_grammer.NEG(line_num)
         # print('ret@NEG')
 
     else:
@@ -939,6 +940,7 @@ token_lists[last_number].append(('$','$'))
 
 from anytree import Node, RenderTree
 def parse(token_lists, parsing_table, first_sets, follow_sets):
+
     root = Node('Program')
     stack = [('Program', root)]
     errors = []
@@ -946,10 +948,12 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
     symbol_stack = []
     flat_token_list = [(line_num, token) for line_num, tokens in sorted(token_lists.items()) for token in tokens]
     index = 0
+    prev_line = 1
     prev_token = None
     while stack and index < len(flat_token_list):
 
         line_num, (token_type, token_value) = flat_token_list[index]
+
         # print('line_num', line_num)
         token = token_value if token_type in ["KEYWORD", "SYMBOL"] else token_type
         # print('t=',token)
@@ -962,7 +966,7 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
                 # print('prevtoken =' , prev_token , 'prevtop =' , prev_top)
                 if prev_top == prev_token[0] :
                     actt = symbol_stack.pop()
-                    code_generator(actt, prev_token[1])
+                    code_generator(actt, prev_token[1] , prev_line)
 
 
 
@@ -973,12 +977,13 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
                 index += 1
                 prev_token = ( token , token_value)
                 prev_top = top
+                prev_line = line_num
 
                 if len(symbol_stack) > 0:
                     action = symbol_stack.pop()
                     # print('action=', action)
                     print("line_num :", line_num)
-                    code_generator(action, token_value)
+                    code_generator(action, token_value, line_num)
             elif top in parsing_table and token in parsing_table[top] and parsing_table[top][token] not in ['synch', None] and top != 'epsilon':
                 production = parsing_table[top][token]
                 if top != 'Program':
@@ -997,7 +1002,7 @@ def parse(token_lists, parsing_table, first_sets, follow_sets):
                         action = symbol_stack.pop()
                         print("line_num :", line_num)
                         # print('action=', action)
-                        code_generator(action, token)
+                        code_generator(action, token ,line_num)
 
             
 
@@ -1057,3 +1062,9 @@ with open('output.txt', 'w') as file:
         formatted_instruction = ', '.join(str(item) if item is not None else '' for item in instruction)
         # Write the formatted instruction to the file
         file.write(f'{index}\t({formatted_instruction})\n')
+
+
+with open('semantic_errors.txt', 'w') as file:
+    for index, instruction in enumerate( new_grammer.semantic_errors):
+
+        file.write(instruction + "\n")
